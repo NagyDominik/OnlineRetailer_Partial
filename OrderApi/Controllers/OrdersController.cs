@@ -65,6 +65,18 @@ namespace OrderApi.Controllers
                 return BadRequest();
             }
 
+            CustomerStatus status = CheckCustomerStatus(order.CustomerId);
+
+            switch (status)
+            {
+                case CustomerStatus.DoesNotExist:
+                    return BadRequest("Customer does not exist!");
+                case CustomerStatus.InBadCreditStanding:
+                    return BadRequest("Customer is in a bad credit standing");
+                default:
+                    break;
+            }
+
             if (ProductItemsAvailable(order))
             {
                 try
@@ -192,6 +204,30 @@ namespace OrderApi.Controllers
         private int GetUnpaidOrders(int customerId)
         {
             return repository.GetAll().Where(x => x.CustomerId == customerId).Where(x => !x.Status.Equals(Models.Status.Paid) && !x.Status.Equals(Models.Status.Canceled)).Count(); 
+        }
+
+        private CustomerStatus CheckCustomerStatus(int customerId)
+        {
+            CustomerDTO customerDTO = customerServiceGateway.Get(customerId);
+
+            if (customerDTO == null)
+            {
+                return CustomerStatus.DoesNotExist;
+            }
+
+            if (!customerDTO.CreditStanding)
+            {
+                return CustomerStatus.InBadCreditStanding;
+            }
+
+            return CustomerStatus.Ok;
+        }
+
+        private enum CustomerStatus
+        {
+            DoesNotExist,
+            InBadCreditStanding,
+            Ok
         }
     }
 }
