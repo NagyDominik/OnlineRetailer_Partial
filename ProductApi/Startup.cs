@@ -12,12 +12,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ProductApi.Data;
+using ProductApi.Infrastructure;
 using ProductApi.Models;
 
 namespace ProductApi
 {
     public class Startup
     {
+        private string cloudAMQPConnectionString = null;
+
+            // "host=hare.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=putyourpasswordhere";
+            //TODO: Uncomment and fill out the string with the correct host/virutalHost/username/password
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -52,6 +57,9 @@ namespace ProductApi
                 var dbInitializer = services.GetService<IDbInitializer>();
                 dbInitializer.Initialize(dbContext);
             }
+            Task.Factory.StartNew(() =>
+                new MessageListener(app.ApplicationServices, cloudAMQPConnectionString).Start());
+
 
             if (env.IsDevelopment())
             {
