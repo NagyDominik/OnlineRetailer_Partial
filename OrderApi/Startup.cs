@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DTOs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,12 +13,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OrderApi.Data;
+using OrderApi.Infrastructure;
 using OrderApi.Models;
 
 namespace OrderApi
 {
     public class Startup
     {
+        private readonly Uri productServiceeUri = new Uri("http://productapi/products/");
+
+        private readonly string cloudAMQPconnectionString = "host=hare.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=putyourpasswordhere";
+
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -36,6 +43,10 @@ namespace OrderApi
 
             // Register database initializer for dependency injection
             services.AddTransient<IDbInitializer, DbInitializer>();
+
+            services.AddSingleton<IServiceGateway<ProductDTO>>(new ProductServiceGateway(productServiceeUri));
+
+            services.AddSingleton<IMessagePublisher>(new MessagePublisher(cloudAMQPconnectionString));
 
             services.AddControllers();
         }

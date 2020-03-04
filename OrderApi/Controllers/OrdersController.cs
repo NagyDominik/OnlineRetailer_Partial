@@ -63,79 +63,74 @@ namespace OrderApi.Controllers
                 return BadRequest();
             }
 
-            if (!CheckCustomer(order.CustomerId))
+            if (ProductItemsAvailable(order))
             {
-                return BadRequest("Customer cannot be found or Customer has an unpaid bill");
-            }
-
-            // Call ProductApi to get the product ordered
-            RestClient c = new RestClient();
-            // You may need to change the port number in the BaseUrl below
-            // before you can run the request.
-            c.BaseUrl = new Uri("https://localhost:5001/products/");
-            if (order.OrderLines.Any())
-            {
-                foreach (var orderline in order.OrderLines)
+                try
                 {
-                    var request = new RestRequest(orderline.ProductId.ToString(), Method.GET);
-                    var response = c.Execute<ProductDTO>(request);
-                    var orderedProduct = response.Data;
+                    messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, order.OrderLines, "completed");
 
-                    if (orderline.Quantity <= orderedProduct.ItemsInStock - orderedProduct.ItemsReserved)
-                    {
-                        // reduce the number of items in stock for the ordered product,
-                        // and create a new order.
-                        orderedProduct.ItemsReserved += orderline.Quantity;
-                        var updateRequest = new RestRequest(orderedProduct.Id.ToString(), Method.PUT);
-                        updateRequest.AddJsonBody(orderedProduct);
-                        var updateResponse = c.Execute(updateRequest);
-
-                        if (updateResponse.IsSuccessful)
-                        {
-                            ChangeCreditStanding(order.CustomerId);
-                            var newOrder = repository.Add(converter.OrderDTOToModel(order));
-                            return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, converter.ModelToOrderDTO(newOrder));
-                        }
-                    }
+                    order.Status = DTOs.Status.Completed;
+                    Order newOrder = repository.Add(converter.OrderDTOToModel(order));
+                    return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
-            }
-
-            // If the order could not be created, "return no content".
-            return NoContent();
-        }
-
-        //WIP, needs refinements
-        private bool CheckCustomer(int id)
-        {
-            RestClient c = new RestClient();
-
-            c.BaseUrl = new Uri("https://localhost:5001/customers/");
-            var request = new RestRequest(id.ToString(), Method.GET);
-            var response = c.Execute<CustomerDTO>(request);
-
-            //this part
-            if (response.Data != null)
-            {
-                return response.Data.CreditStanding;
+                catch
+                {
+                    return StatusCode(500, "An error happened. Try again.");
+                }
             }
             else
             {
-                return false;
+                return StatusCode(500, "Not enough products are available.");
             }
         }
 
-        private void ChangeCreditStanding(int id)
+        private bool ProductItemsAvailable(OrderDTO order)
         {
-            RestClient c = new RestClient();
-            c.BaseUrl = new Uri("https://localhost:5001/customers/");
-            CustomerDTO updateDto = new CustomerDTO()
+            foreach (OrderLineDTO orderLine in order.OrderLines)
             {
-                Id = id,
-                CreditStanding = false
-            };
-            var customerUpdateReq = new RestRequest(id.ToString(), Method.PUT);
-            customerUpdateReq.AddJsonBody(updateDto);
-            c.Execute(customerUpdateReq);
+                ProductDTO orderedProduct = productServiceGateway.Get(orderLine.Id);
+                if (orderLine.Quantity > orderedProduct.ItemsInStock - orderedProduct.ItemsReserved)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
+
+        // PUT orders/5/cancel
+        // This action method cancels an order and publishes an OrderStatusChangedMessage
+        // with topic set to "cancelled".
+        [HttpPut("{id}/cancel")]
+        public IActionResult Cancel(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
+
+        // PUT orders/5/ship
+        // This action method ships an order and publishes an OrderStatusChangedMessage.
+        // with topic set to "shipped".
+        [HttpPut("{id}/ship")]
+        public IActionResult Ship(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
+
+        // PUT orders/5/pay
+        // This action method marks an order as paid and publishes an OrderPaidMessage
+        // (which have not yet been implemented). The OrderPaidMessage should specify the
+        // Id of the customer who placed the order, and a number that indicates how many
+        // unpaid orders the customer has (not counting cancelled orders). 
+        [HttpPut("{id}/pay")]
+        public IActionResult Pay(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
+
     }
 }
