@@ -4,9 +4,9 @@ using System.Linq;
 using DTOs;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
+using OrderApi.Infrastructure;
 using OrderApi.Models;
 using RestSharp;
-using Status = OrderApi.Models.Status;
 
 namespace OrderApi.Controllers
 {
@@ -15,12 +15,16 @@ namespace OrderApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IRepository<Order> repository;
+        IServiceGateway<ProductDTO> productServiceGateway;
+        IMessagePublisher messagePublisher;
         private readonly DataConverter converter;
 
-        public OrdersController(IRepository<Order> repos)
+        public OrdersController(IRepository<Order> repos, IServiceGateway<ProductDTO> gateway, IMessagePublisher publisher)
         {
-            repository = repos;
-            converter = new DataConverter();
+            this.repository = repos;
+            this.productServiceGateway = gateway;
+            this.messagePublisher = publisher;
+            this.converter = new DataConverter();
         }
 
         // GET: orders
