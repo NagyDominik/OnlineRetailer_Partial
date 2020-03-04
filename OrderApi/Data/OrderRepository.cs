@@ -38,7 +38,17 @@ namespace OrderApi.Data
 
         IEnumerable<Order> IRepository<Order>.GetAll()
         {
-            return db.Orders.ToList();
+            IEnumerable<Order> orders =  db.Orders.ToList();
+
+            foreach (Order order in orders)
+            {
+                int orderId = order.Id;
+                IEnumerable<OrderLine> orderLines = db.OrderLines.Where(l => l.OrderId == orderId);
+                order.OrderLines = orderLines.ToList();
+            }
+
+            return orders;
+
         }
 
         void IRepository<Order>.Remove(int id)

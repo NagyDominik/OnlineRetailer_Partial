@@ -87,7 +87,11 @@ namespace OrderApi.Controllers
                     messagePublisher.PublishCustomerCreditStandingChangedMessage(order.CustomerId, false, "bad");
 
                     order.Status = DTOs.Status.Completed;
-                    Order newOrder = repository.Add(converter.OrderDTOToModel(order));
+
+                    Order newOrder = converter.OrderDTOToModel(order);
+
+
+                    newOrder = repository.Add(newOrder);
                     return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
                 catch
@@ -105,7 +109,7 @@ namespace OrderApi.Controllers
         {
             foreach (OrderLineDTO orderLine in order.OrderLines)
             {
-                ProductDTO orderedProduct = productServiceGateway.Get(orderLine.Id);
+                ProductDTO orderedProduct = productServiceGateway.Get(orderLine.ProductId);
                 if (orderLine.Quantity > orderedProduct.ItemsInStock - orderedProduct.ItemsReserved)
                 {
                     return false;

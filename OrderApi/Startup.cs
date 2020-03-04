@@ -24,11 +24,9 @@ namespace OrderApi
         //private readonly Uri customerServiceUri = new Uri("http://customerapi/customers/");
 
         private readonly Uri productServiceUri = new Uri("https://localhost:5004/products/");
-        private readonly Uri customerServiceUri = new Uri("https://localhost:5000/customers/");
+        private readonly Uri customerServiceUri = new Uri("https://localhost:5001/customers/");
 
-
-        private readonly string cloudAMQPconnectionString = "host=hare.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=putyourpasswordhere";
-
+        private readonly string cloudAMQPconnectionString = "host=hawk.rmq.cloudamqp.com;virtualHost=lupcpmxk;username=lupcpmxk;password=V50BilRpuuPrQ33ZeRKj0Flq5XAGG0sb";
 
         public Startup(IConfiguration configuration)
         {

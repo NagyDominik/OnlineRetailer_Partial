@@ -17,7 +17,9 @@ namespace OrderApi
             
             foreach (var orderline in dto.OrderLines)
             {
-                ret.OrderLines.Add(OrderLineDTOToModel(dto.Id, orderline));
+                OrderLine orderLineModel = OrderLineDTOToModel(dto.Id, orderline);
+                orderLineModel.Order = ret;
+                ret.OrderLines.Add(orderLineModel);
             }
 
             return ret;
