@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CustomerApi.Data;
+using CustomerApi.Infrastructure;
 using CustomerApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,11 @@ namespace CustomerApi
 {
     public class Startup
     {
+        private string cloudAMQPConnectionString = null;
+
+        // "host=hare.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=putyourpasswordhere";
+        //TODO: Uncomment and fill out the string with the correct host/virutalHost/username/password
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -52,6 +58,8 @@ namespace CustomerApi
                 var dbInitializer = services.GetService<IDbInitializer>();
                 dbInitializer.Initialize(dbContext);
             }
+            Task.Factory.StartNew(() =>
+                new MessageListener(app.ApplicationServices, cloudAMQPConnectionString).Start());
 
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
