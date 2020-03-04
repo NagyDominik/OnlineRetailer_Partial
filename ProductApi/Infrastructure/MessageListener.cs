@@ -36,8 +36,6 @@ namespace ProductApi.Infrastructure
                 bus.Subscribe<OrderStatusChangedMessage>("productApiShipped", HandleOrderShipped,
                     x => x = x.WithTopic("shipped"));
 
-                bus.Subscribe<OrderStatusChangedMessage>("productApiPaid", HandleOrderPaid,
-                    x => x = x.WithTopic("paid"));
 
                 lock (this)
                 {

@@ -20,7 +20,12 @@ namespace OrderApi
 {
     public class Startup
     {
-        private readonly Uri productServiceeUri = new Uri("http://productapi/products/");
+        //private readonly Uri productServiceUri = new Uri("http://productapi/products/");
+        //private readonly Uri customerServiceUri = new Uri("http://customerapi/customers/");
+
+        private readonly Uri productServiceUri = new Uri("https://localhost:5004/products/");
+        private readonly Uri customerServiceUri = new Uri("https://localhost:5000/customers/");
+
 
         private readonly string cloudAMQPconnectionString = "host=hare.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=putyourpasswordhere";
 
@@ -44,7 +49,8 @@ namespace OrderApi
             // Register database initializer for dependency injection
             services.AddTransient<IDbInitializer, DbInitializer>();
 
-            services.AddSingleton<IServiceGateway<ProductDTO>>(new ProductServiceGateway(productServiceeUri));
+            services.AddSingleton<IServiceGateway<ProductDTO>>(new ProductServiceGateway(productServiceUri));
+            services.AddSingleton<IServiceGateway<CustomerDTO>>(new CustomerServiceGateway(customerServiceUri));
 
             services.AddSingleton<IMessagePublisher>(new MessagePublisher(cloudAMQPconnectionString));
 

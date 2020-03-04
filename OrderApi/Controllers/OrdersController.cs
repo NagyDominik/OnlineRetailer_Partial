@@ -15,14 +15,16 @@ namespace OrderApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IRepository<Order> repository;
-        IServiceGateway<ProductDTO> productServiceGateway;
-        IMessagePublisher messagePublisher;
+        private readonly IServiceGateway<ProductDTO> productServiceGateway;
+        private readonly IServiceGateway<CustomerDTO> customerServiceGateway;
+        private readonly IMessagePublisher messagePublisher;
         private readonly DataConverter converter;
 
-        public OrdersController(IRepository<Order> repos, IServiceGateway<ProductDTO> gateway, IMessagePublisher publisher)
+        public OrdersController(IRepository<Order> repos, IServiceGateway<ProductDTO> prudoctGateway, IServiceGateway<CustomerDTO> customerGateway, IMessagePublisher publisher)
         {
             this.repository = repos;
-            this.productServiceGateway = gateway;
+            this.productServiceGateway = prudoctGateway;
+            this.customerServiceGateway = customerGateway;
             this.messagePublisher = publisher;
             this.converter = new DataConverter();
         }
@@ -103,9 +105,28 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/cancel")]
         public IActionResult Cancel(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Order order = repository.Get(id);
 
-            // Add code to implement this method.
+                order.Status = Models.Status.Canceled;
+                repository.Edit(order);
+
+                List<OrderLineDTO> orderLines = new List<OrderLineDTO>();
+
+                foreach (OrderLine orderLine in order.OrderLines)
+                {
+                    orderLines.Add(converter.ModelToOrderLineDTO(orderLine));
+                }
+
+                messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, orderLines, "cancelled");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"An error occured: {e.Message}");
+            }
+
+            return Ok();
         }
 
         // PUT orders/5/ship
@@ -114,9 +135,28 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/ship")]
         public IActionResult Ship(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Order order = repository.Get(id);
 
-            // Add code to implement this method.
+                order.Status = Models.Status.Shipped;
+                repository.Edit(order);
+
+                List<OrderLineDTO> orderLines = new List<OrderLineDTO>();
+
+                foreach (OrderLine orderLine in order.OrderLines)
+                {
+                    orderLines.Add(converter.ModelToOrderLineDTO(orderLine));
+                }
+
+                messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, orderLines, "shipped");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"An error occured: {e.Message}");
+            }
+
+            return Ok();
         }
 
         // PUT orders/5/pay
@@ -127,10 +167,30 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/pay")]
         public IActionResult Pay(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Order order = repository.Get(id);
+                order.Status = Models.Status.Paid;
 
-            // Add code to implement this method.
+                repository.Edit(order);
+
+                // This might have to be changed
+                int unpaidOrders = GetUnpaidOrders(order.CustomerId);
+
+                messagePublisher.PublishOrderPaidMessage(id, unpaidOrders, "paid");
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"An error occured: {e.Message}");
+            }
+
+            return Ok();
         }
 
+        private int GetUnpaidOrders(int customerId)
+        {
+            return repository.GetAll().Where(x => x.CustomerId == customerId).Where(x => !x.Status.Equals(Models.Status.Paid) && !x.Status.Equals(Models.Status.Canceled)).Count(); 
+        }
     }
 }

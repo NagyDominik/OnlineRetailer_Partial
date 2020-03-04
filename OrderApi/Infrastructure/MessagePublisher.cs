@@ -8,7 +8,7 @@ namespace OrderApi.Infrastructure
 {
     class MessagePublisher : IMessagePublisher, IDisposable
     {
-        IBus bus;
+        private readonly IBus bus;
 
         public MessagePublisher(string connString)
         {
@@ -21,6 +21,17 @@ namespace OrderApi.Infrastructure
             {
                 bus.Dispose();
             }
+        }
+
+        public void PublishOrderPaidMessage(int? custId, int unpaidOrders, string topic)
+        {
+            OrderPaidMessage orderPaidMessage = new OrderPaidMessage
+            {
+                CustomerId = custId,
+                UnpaidOrders = unpaidOrders
+            };
+
+            bus.Publish(orderPaidMessage, topic);
         }
 
         public void PublishOrderStatusChangedMessage(int? customerId, IList<OrderLineDTO> orderLines, string topic)
