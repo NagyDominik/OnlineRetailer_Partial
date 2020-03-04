@@ -7,6 +7,7 @@ using OrderApi.Data;
 using OrderApi.Infrastructure;
 using OrderApi.Models;
 using RestSharp;
+using Status = OrderApi.Models.Status;
 
 namespace OrderApi.Controllers
 {
@@ -70,6 +71,7 @@ namespace OrderApi.Controllers
                 try
                 {
                     messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, order.OrderLines, "completed");
+
                     messagePublisher.PublishCustomerCreditStandingChangedMessage(order.CustomerId, false, "bad");
 
                     order.Status = DTOs.Status.Completed;
@@ -121,6 +123,8 @@ namespace OrderApi.Controllers
                 }
 
                 messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, orderLines, "cancelled");
+
+                messagePublisher.PublishCustomerCreditStandingChangedMessage(order.CustomerId, true, "good");
             }
             catch (Exception e)
             {
@@ -178,7 +182,9 @@ namespace OrderApi.Controllers
                 // This might have to be changed
                 int unpaidOrders = GetUnpaidOrders(order.CustomerId);
 
-                messagePublisher.PublishOrderPaidMessage(id, unpaidOrders, "paid");
+                messagePublisher.PublishOrderPaidMessage(id, unpaidOrders, "paid"); // this message maybe not required to send
+
+                messagePublisher.PublishCustomerCreditStandingChangedMessage(order.CustomerId, true, "good");
 
             }
             catch (Exception e)
@@ -191,7 +197,7 @@ namespace OrderApi.Controllers
 
         private int GetUnpaidOrders(int customerId)
         {
-            return repository.GetAll().Where(x => x.CustomerId == customerId).Where(x => !x.Status.Equals(Models.Status.Paid) && !x.Status.Equals(Models.Status.Canceled)).Count(); 
+            return repository.GetAll().Where(x => x.CustomerId == customerId).Count(x => !x.Status.Equals(Status.Paid) && !x.Status.Equals(Status.Canceled)); 
         }
     }
 }
