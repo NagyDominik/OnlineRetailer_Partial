@@ -70,6 +70,7 @@ namespace OrderApi.Controllers
                 try
                 {
                     messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, order.OrderLines, "completed");
+                    messagePublisher.PublishCustomerCreditStandingChangedMessage(order.CustomerId, false, "bad");
 
                     order.Status = DTOs.Status.Completed;
                     Order newOrder = repository.Add(converter.OrderDTOToModel(order));

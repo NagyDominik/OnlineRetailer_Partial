@@ -36,7 +36,6 @@ namespace ProductApi.Infrastructure
                 bus.Subscribe<OrderStatusChangedMessage>("productApiShipped", HandleOrderShipped,
                     x => x = x.WithTopic("shipped"));
 
-
                 lock (this)
                 {
                     Monitor.Wait(this);
@@ -77,6 +76,8 @@ namespace ProductApi.Infrastructure
                     product.ItemsReserved -= orderLine.Quantity;
                     productRepos.Edit(product);
                 }
+
+                
             }
         }
 
