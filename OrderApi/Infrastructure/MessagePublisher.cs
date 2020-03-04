@@ -33,5 +33,16 @@ namespace OrderApi.Infrastructure
 
             bus.Publish(orderStatusChangedMessage, topic);
         }
+
+        public void PublishCustomerCreditStandingChangedMessage(int customerId, bool creditStanding, string topic)
+        {
+            CustomerCreditStandingChangedMessage customerCreditStandingChangedMessage = new CustomerCreditStandingChangedMessage
+            {
+                CustomerId = customerId,
+                CreditStanding = creditStanding
+            };
+
+            bus.Publish(customerCreditStandingChangedMessage, topic);
+        }
     }
 }
