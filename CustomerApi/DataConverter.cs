@@ -26,7 +26,7 @@ namespace CustomerApi
             ret.Id = model.Id;
             ret.Name = model.Name;
             ret.Email = model.Email;
-            ret.Email = model.PhoneNumber;
+            ret.PhoneNumber = model.PhoneNumber;
             ret.BillingAddress = model.BillingAddress;
             ret.ShippingAddress = model.ShippingAddress;
             ret.CreditStanding = model.CreditStanding;

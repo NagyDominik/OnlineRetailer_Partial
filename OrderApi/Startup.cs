@@ -20,12 +20,14 @@ namespace OrderApi
 {
     public class Startup
     {
-        //private readonly Uri productServiceUri = new Uri("http://productapi/products/");
-        //private readonly Uri customerServiceUri = new Uri("http://customerapi/customers/");
 
+#if DEBUG
         private readonly Uri productServiceUri = new Uri("https://localhost:5004/products/");
         private readonly Uri customerServiceUri = new Uri("https://localhost:5001/customers/");
-
+#else
+        private readonly Uri productServiceUri = new Uri("http://productapi/products/");
+        private readonly Uri customerServiceUri = new Uri("http://customerapi/customers/");
+#endif
         private readonly string cloudAMQPconnectionString = "host=hawk.rmq.cloudamqp.com;virtualHost=lupcpmxk;username=lupcpmxk;password=V50BilRpuuPrQ33ZeRKj0Flq5XAGG0sb";
 
         public Startup(IConfiguration configuration)

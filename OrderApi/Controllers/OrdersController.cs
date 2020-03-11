@@ -171,6 +171,8 @@ namespace OrderApi.Controllers
                 }
 
                 messagePublisher.PublishOrderStatusChangedMessage(order.CustomerId, orderLines, "shipped");
+
+                SendEmailNotificationToCustomer(order.CustomerId);
             }
             catch (Exception e)
             {
@@ -178,6 +180,17 @@ namespace OrderApi.Controllers
             }
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Mock method, represents an email sent to the customer upon shipping
+        /// </summary>
+        /// <param name="customerId">The id of the customer</param>
+        private void SendEmailNotificationToCustomer(int customerId)
+        {
+            CustomerDTO customer = customerServiceGateway.Get(customerId);
+
+            Console.WriteLine($"Sent confirmation email to {customer.Email}");
         }
 
         // PUT orders/5/pay

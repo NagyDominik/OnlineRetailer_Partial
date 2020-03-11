@@ -33,7 +33,12 @@ namespace OrderApi.Data
 
         Order IRepository<Order>.Get(int id)
         {
-            return db.Orders.FirstOrDefault(o => o.Id == id);
+            Order order = db.Orders.FirstOrDefault(o => o.Id == id);
+
+            List<OrderLine> orderLines = db.OrderLines.Where(o => o.OrderId == order.Id).ToList(); ;
+            order.OrderLines = orderLines;
+
+            return order;
         }
 
         IEnumerable<Order> IRepository<Order>.GetAll()
