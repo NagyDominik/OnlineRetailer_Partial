@@ -1,6 +1,44 @@
 {
   "ReRoutes": [
     {
+      "DownstreamPathTemplate": "/customers",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "customerapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/customerapi/customers",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "allcustomers"
+    },
+    {
+      "DownstreamPathTemplate": "/customers/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "customerapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/customerapi/customers/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "customer"
+    },
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "customerapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/customerapi/{catchAll}",
+      "UpstreamHttpMethod": [ "Get", "Post" ]
+    },
+    {
       // ProductApi routes for aggregate: Orders and product
       "DownstreamPathTemplate": "/products",
       "DownstreamScheme": "http",

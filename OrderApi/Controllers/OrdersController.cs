@@ -57,6 +57,27 @@ namespace OrderApi.Controllers
             return new ObjectResult(converter.ModelToOrderDTO(item));
         }
 
+        // GET orders/product/5
+        /* This action method was provided to support request aggregate
+           "Orders by product" in OnlineRetailerApiGateway.*/
+        [HttpGet("product/{id}", Name = "GetOrderByProduct")]
+        public IEnumerable<OrderDTO> GetByProduct(int id)
+        {
+            List<OrderDTO> ordersWithSpecificProduct = new List<OrderDTO>();
+            var orders = repository.GetAll();
+
+            foreach (var order in orders)
+            {
+                if (order.OrderLines.Any(o => o.ProductId == id))
+                {
+                    ordersWithSpecificProduct.Add(converter.ModelToOrderDTO(order));
+                }
+            }
+
+            return ordersWithSpecificProduct;
+        }
+
+
         // POST orders
         [HttpPost]
         public IActionResult Post([FromBody]OrderDTO order)
