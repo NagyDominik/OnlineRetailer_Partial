@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DTOs", "DTOs\DTOs.csproj", 
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{98213920-D2FF-47CA-8568-04BE564B94E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineRetailerApiGateway", "OnlineRetailerApiGateway\OnlineRetailerApiGateway.csproj", "{811F60B5-B5E0-4682-9244-DA3457B62A39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{98213920-D2FF-47CA-8568-04BE564B94E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98213920-D2FF-47CA-8568-04BE564B94E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98213920-D2FF-47CA-8568-04BE564B94E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{811F60B5-B5E0-4682-9244-DA3457B62A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{811F60B5-B5E0-4682-9244-DA3457B62A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{811F60B5-B5E0-4682-9244-DA3457B62A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{811F60B5-B5E0-4682-9244-DA3457B62A39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
