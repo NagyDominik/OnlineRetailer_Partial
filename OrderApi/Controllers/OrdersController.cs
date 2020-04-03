@@ -77,6 +77,26 @@ namespace OrderApi.Controllers
             return ordersWithSpecificProduct;
         }
 
+        // GET orders/customer/2
+        /* This action method was provided to support request aggregate
+           "Orders by customer" in OnlineRetailerApiGateway.*/
+        [HttpGet("customer/{id}", Name = "GetOrderByCustomer")]
+        public IEnumerable<OrderDTO> GetByCusomer(int id)
+        {
+            List<OrderDTO> ordersBySpecificCustomer = new List<OrderDTO>();
+            var orders = repository.GetAll();
+
+            foreach (var order in orders)
+            {
+                if (order.CustomerId == id)
+                {
+                    ordersBySpecificCustomer.Add(converter.ModelToOrderDTO(order));
+                }
+            }
+
+            return ordersBySpecificCustomer;
+        }
+
 
         // POST orders
         [HttpPost]

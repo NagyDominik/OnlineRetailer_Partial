@@ -1,6 +1,7 @@
 {
   "ReRoutes": [
     {
+      //Route for get all customers
       "DownstreamPathTemplate": "/customers",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -14,6 +15,7 @@
       "Key": "allcustomers"
     },
     {
+      //Route for get a customer by id
       "DownstreamPathTemplate": "/customers/{id}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -27,6 +29,7 @@
       "Key": "customer"
     },
     {
+      //Other routes for customer but this maybe unnecessary to have it.
       "DownstreamPathTemplate": "/{catchAll}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -36,7 +39,7 @@
         }
       ],
       "UpstreamPathTemplate": "/customerapi/{catchAll}",
-      "UpstreamHttpMethod": [ "Get", "Post" ]
+      "UpstreamHttpMethod": [ "Put", "Post" ]
     },
     {
       // ProductApi routes for aggregate: Orders and product
@@ -97,6 +100,22 @@
       "Key": "ordersbyproduct"
     },
     {
+      // OrderApi routes for aggregate: Orders by customer
+      // (this aggregate requires the OrderApi to implement a
+      //  "GET /orders/customer/{id}" controller action method)
+      "DownstreamPathTemplate": "/orders/customer/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/orderapi/orders/customer/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "ordersbycustomer"
+    },
+    {
       // Other ProductApi routes
       "DownstreamPathTemplate": "/{catchAll}",
       "DownstreamScheme": "http",
@@ -123,7 +142,10 @@
       "UpstreamHttpMethod": [ "Get", "Post" ]
     }
   ],
-  // Aggregates: Orders by product
+  /*Aggregates: 
+               Orders by product
+               Orders and products
+               Orders by customer */
   "Aggregates": [
     {
       "ReRouteKeys": [
@@ -138,8 +160,16 @@
         "allproducts"
       ],
       "UpstreamPathTemplate": "/aggregates/ordersandproducts"
+    },
+    {
+      "ReRouteKeys": [
+        "ordersbycustomer",
+        "customer"
+      ],
+      "UpstreamPathTemplate": "/aggregates/ordersbycustomer/{id}"
     }
   ],
+
   // Global configuration
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:7000"
