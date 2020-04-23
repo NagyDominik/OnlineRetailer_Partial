@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
 using OrderApi.Models;
-using RestSharp;
 using Status = OrderApi.Models.Status;
 
 namespace OrderApi.Controllers

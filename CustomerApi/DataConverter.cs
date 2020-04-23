@@ -1,6 +1,5 @@
 ﻿using DTOs;
 using CustomerApi.Models;
-using System;
 
 namespace CustomerApi
 {

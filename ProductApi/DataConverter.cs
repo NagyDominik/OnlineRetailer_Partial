@@ -1,6 +1,5 @@
 ﻿using DTOs;
 using ProductApi.Models;
-using System;
 
 namespace ProductApi
 {
