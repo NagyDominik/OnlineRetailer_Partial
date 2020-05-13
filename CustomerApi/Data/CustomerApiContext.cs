@@ -6,7 +6,8 @@ namespace CustomerApi.Data
     public class CustomerApiContext : DbContext
     {
         public CustomerApiContext(DbContextOptions<CustomerApiContext> options) : base(options) { }
-
-        public DbSet<Customer> Customers { get; set; }
+        //empty constructor for test environment 
+        protected CustomerApiContext() { }
+        public virtual DbSet<Customer> Customers { get; set; }
     }
 }
