@@ -1,4 +1,4 @@
-﻿using CustomerApi.Data;
+using CustomerApi.Data;
 using CustomerApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -103,8 +103,10 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                 {
                     databaseContext.Customers.Add((Customer) item[0]);
                 }
+
                 await databaseContext.SaveChangesAsync();
             }
+
             return databaseContext;
         }
 
@@ -122,7 +124,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             foreach (var item in objects)
             {
-                customers.Add((Customer)item[0]);
+                customers.Add((Customer) item[0]);
             }
 
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
@@ -130,15 +132,15 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator()).Returns(customers.AsQueryable().GetEnumerator());
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
+                .Returns(customers.AsQueryable().GetEnumerator());
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
-            contextMock.Setup(x => x.Set<Customer>()).Returns(dbSetMock.Object);
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
 
-            IRepository<Customer>customerRepository = new CustomerRepository(contextMock.Object);
-            
+            IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+
             List<Customer> retrievedCustomers = customerRepository.GetAll().ToList();
 
             // Verify that the GetAll method is only called once
@@ -152,7 +154,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #region GetCustomerByID
 
         [Fact, Priority(0)]
-        public async void GetUserByIdTest()
+        public void GetCustomerByIdTest()
         {
             CustomerTestData testData = new CustomerTestData();
             var objects = testData.ToList();
@@ -161,19 +163,22 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             foreach (var item in objects)
             {
-                customers.Add((Customer) item[0]);
+                customers.Add((Customer)item[0]);
             }
 
-            var dbContext = await GetDatabaseContext();
+            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
 
-            IRepository<Customer> repo = new CustomerRepository(dbContext);
+            Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
-            for (int i = 0; i < customers.Count; i++)
-            {
-                int id = i + 1;
-                Customer retrievedUser = repo.Get(id);
-                Assert.Equal(id, retrievedUser.Id);
-            }
+            contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+            dbSetMock.Setup(x => x.FirstOrDefault(f => f.Id == It.IsAny<int>())).Returns(customers.FirstOrDefault(x => x.Id == It.IsAny<int>()));
+            IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+
+            customerRepository.Get(1);
+
+            contextMock.Verify(x=> x.Customers, Times.Once);
+            dbSetMock.Verify(x=>x.FirstOrDefault(f => f.Id == It.IsAny<int>()), Times.Once);
+
         }
 
         #endregion
@@ -205,6 +210,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             List<Customer> retrievedCustomers = repo.GetAll().ToList();
             Assert.DoesNotContain(newCustomer, retrievedCustomers);
         }
+
         #endregion
 
         #region DeleteCustomer
@@ -212,8 +218,6 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         [Fact, Priority(1)]
         public async void DeleteCustomer()
         {
-            
-
             var dbContext = await GetDatabaseContext();
             IRepository<Customer> repo = new CustomerRepository(dbContext);
             Customer cust = repo.Get(2);
@@ -240,9 +244,9 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             customerUpdate.Email = customer.Email;
             customerUpdate.BillingAddress = customer.BillingAddress;
             customerUpdate.Name = customer.Name;
-            
+
             repo.Edit(customerUpdate);
-            Assert.Equal(customer.Email ,customerUpdate.Email);
+            Assert.Equal(customer.Email, customerUpdate.Email);
         }
     }
 }
