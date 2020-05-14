@@ -167,17 +167,27 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             }
 
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
+                .Returns(customers.AsQueryable().GetEnumerator());
+
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
-            dbSetMock.Setup(x => x.FirstOrDefault(f => f.Id == It.IsAny<int>())).Returns(customers.FirstOrDefault(x => x.Id == It.IsAny<int>()));
+            
+            //dbSetMock.Setup(x => x.FirstOrDefault(f => f.Id == It.IsAny<int>())).Returns(customers.FirstOrDefault(x => x.Id == It.IsAny<int>()));
+            
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
-            customerRepository.Get(1);
+            Customer cust1 = customerRepository.Get(1);
 
+            Assert.Equal(1, cust1.Id);
             contextMock.Verify(x=> x.Customers, Times.Once);
-            dbSetMock.Verify(x=>x.FirstOrDefault(f => f.Id == It.IsAny<int>()), Times.Once);
+           
+            // dbSetMock.Verify(x=>x.FirstOrDefault(f => f.Id == It.IsAny<int>()), Times.Once);
 
         }
 
