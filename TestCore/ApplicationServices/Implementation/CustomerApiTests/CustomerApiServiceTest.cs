@@ -113,7 +113,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #region GetAllCustomer
 
         [Fact, Priority(-10)]
-        public async Task GetAllUserTest()
+        public void GetAllUserTest()
         {
             CustomerTestData testData = new CustomerTestData();
             var objects = testData.ToList();
@@ -125,10 +125,25 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                 customers.Add((Customer)item[0]);
             }
 
-            var dbContext = await GetDatabaseContext();
-            IRepository<Customer> repo = new CustomerRepository(dbContext);
+            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
 
-            List<Customer> retrievedCustomers = repo.GetAll().ToList();
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator()).Returns(customers.AsQueryable().GetEnumerator());
+
+            Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
+
+            contextMock.Setup(x => x.Set<Customer>()).Returns(dbSetMock.Object);
+            contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+
+            IRepository<Customer>customerRepository = new CustomerRepository(contextMock.Object);
+            
+            List<Customer> retrievedCustomers = customerRepository.GetAll().ToList();
+
+            // Verify that the GetAll method is only called once
+            contextMock.Verify(x => x.Customers, Times.Once);
+
             Assert.Equal(customers, retrievedCustomers);
         }
 
