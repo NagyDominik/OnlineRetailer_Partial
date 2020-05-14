@@ -177,17 +177,13 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
-            
-            //dbSetMock.Setup(x => x.FirstOrDefault(f => f.Id == It.IsAny<int>())).Returns(customers.FirstOrDefault(x => x.Id == It.IsAny<int>()));
-            
+
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
             Customer cust1 = customerRepository.Get(1);
 
             Assert.Equal(1, cust1.Id);
             contextMock.Verify(x=> x.Customers, Times.Once);
-           
-            // dbSetMock.Verify(x=>x.FirstOrDefault(f => f.Id == It.IsAny<int>()), Times.Once);
 
         }
 
@@ -196,8 +192,18 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #region CreateCustomer
 
         [Fact, Priority(0)]
-        public async void AddUser()
+        public void AddUser()
         {
+            CustomerTestData testData = new CustomerTestData();
+            var objects = testData.ToList();
+
+            List<Customer> customers = new List<Customer>();
+
+            foreach (var item in objects)
+            {
+                customers.Add((Customer)item[0]);
+            }
+
             Customer newCustomer = new Customer()
             {
                 Id = 4,
@@ -209,16 +215,20 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                 CreditStanding = true
             };
 
-            var dbContext = await GetDatabaseContext();
-            IRepository<Customer> repo = new CustomerRepository(dbContext);
+            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
 
-            repo.Add(newCustomer);
-            Assert.Equal(newCustomer, repo.Get(newCustomer.Id));
+            Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
-            //removing the customer 
-            repo.Remove(newCustomer.Id);
-            List<Customer> retrievedCustomers = repo.GetAll().ToList();
-            Assert.DoesNotContain(newCustomer, retrievedCustomers);
+            contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+            dbSetMock.Setup(x => x.Add(It.IsAny<Customer>()).Entity).Returns(newCustomer);
+
+            IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+
+            Customer cust = customerRepository.Add(newCustomer);
+
+
+            dbSetMock.Verify(x => x.Add(cust).Entity, Times.Once);
+
         }
 
         #endregion
@@ -226,16 +236,23 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #region DeleteCustomer
 
         [Fact, Priority(1)]
-        public async void DeleteCustomer()
+        public  void DeleteCustomer()
         {
-            var dbContext = await GetDatabaseContext();
-            IRepository<Customer> repo = new CustomerRepository(dbContext);
-            Customer cust = repo.Get(2);
+            CustomerTestData testData = new CustomerTestData();
+            var objects = testData.ToList();
 
-            //removing the customer 
-            repo.Remove(cust.Id);
-            List<Customer> retrievedCustomers = repo.GetAll().ToList();
-            Assert.DoesNotContain(cust, retrievedCustomers);
+            List<Customer> customers = new List<Customer>();
+
+            foreach (var item in objects)
+            {
+                customers.Add((Customer)item[0]);
+            }
+
+            Mock<DbContext> context = new Mock<DbContext>();
+            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+            context.Setup(x => x.Set<Customer>()).Returns(dbSetMock.Object);
+            //dbSetMock.Setup(x => x.Remove(It.IsAny<Customer>())).Returns()
+
         }
 
         #endregion
