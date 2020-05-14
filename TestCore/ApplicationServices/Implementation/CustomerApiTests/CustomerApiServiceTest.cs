@@ -134,7 +134,6 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
-            contextMock.Setup(x => x.Set<Customer>()).Returns(dbSetMock.Object);
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
 
             IRepository<Customer>customerRepository = new CustomerRepository(contextMock.Object);
