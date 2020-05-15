@@ -17,7 +17,7 @@ namespace CustomerApi.Data
 
         Customer IRepository<Customer>.Add(Customer entity)
         {
-            var newCustomer = db.Customers.Add(entity).Entity;
+            Customer newCustomer = db.Customers.Add(entity).Entity;
             db.SaveChanges();
             return newCustomer;
         }

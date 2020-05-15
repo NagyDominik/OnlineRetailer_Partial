@@ -11,6 +11,9 @@ using Moq;
 using NSubstitute;
 using Xunit;
 using Xunit.Priority;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 {
@@ -192,7 +195,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #region CreateCustomer
 
         [Fact, Priority(0)]
-        public void AddUser()
+        public void AddCustomer()
         {
             CustomerTestData testData = new CustomerTestData();
             var objects = testData.ToList();
@@ -216,18 +219,23 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             };
 
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
-
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
-            dbSetMock.Setup(x => x.Add(It.IsAny<Customer>()).Entity).Returns(newCustomer);
 
-            IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+            // Create a mock EntityEntry<Customer>
+            Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+            Mock<Model> model = new Mock<Model>();
 
-            Customer cust = customerRepository.Add(newCustomer);
+            Mock<EntityEntry<Customer>> custEntry = new Mock<EntityEntry<Customer>>(new InternalShadowEntityEntry(iStateManager.Object, new EntityType("Customer", model.Object, Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
 
+            dbSetMock.Setup(x => x.Add(It.IsAny<Customer>())).Callback<Customer>(c => customers.Add(c)).Returns(custEntry.Object);
 
-            dbSetMock.Verify(x => x.Add(cust).Entity, Times.Once);
+            IRepository<Customer> c = new CustomerRepository(contextMock.Object);
+            
+            Customer cust = c.Add(newCustomer);
+
+            dbSetMock.Verify(x => x.Add(newCustomer), Times.Once);
 
         }
 
