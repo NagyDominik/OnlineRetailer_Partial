@@ -5,7 +5,13 @@ namespace OrderApi.Data
 {
     public class OrderApiContext : DbContext
     {
-        public OrderApiContext(DbContextOptions<OrderApiContext> options) : base(options) { }
+        public OrderApiContext(DbContextOptions<OrderApiContext> options) : base(options)
+        {
+        }
+
+        protected OrderApiContext()
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,7 +25,7 @@ namespace OrderApi.Data
                 .HasForeignKey(ol => ol.OrderId);
         }
 
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderLine> OrderLines { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<OrderLine> OrderLines { get; set; }
     }
 }

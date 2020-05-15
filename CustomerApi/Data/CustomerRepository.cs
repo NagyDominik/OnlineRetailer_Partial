@@ -38,11 +38,11 @@ namespace CustomerApi.Data
             return db.Customers.ToList();
         }
 
-        void IRepository<Customer>.Remove(int id)
+        Customer IRepository<Customer>.Remove(int id)
         {
-            var customer = db.Customers.FirstOrDefault(c => c.Id == id);
-            db.Customers.Remove(customer);
+            var customer = db.Customers.Remove(new Customer(){Id = id}).Entity;
             db.SaveChanges();
+            return customer;
         }
     }
 }

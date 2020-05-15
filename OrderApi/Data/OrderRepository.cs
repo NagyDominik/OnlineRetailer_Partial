@@ -19,7 +19,7 @@ namespace OrderApi.Data
         {
             if (entity.Date == null)
                 entity.Date = DateTime.Now;
-            
+
             var newOrder = db.Orders.Add(entity).Entity;
             db.SaveChanges();
             return newOrder;
@@ -35,7 +35,8 @@ namespace OrderApi.Data
         {
             Order order = db.Orders.FirstOrDefault(o => o.Id == id);
 
-            List<OrderLine> orderLines = db.OrderLines.Where(o => o.OrderId == order.Id).ToList(); ;
+            List<OrderLine> orderLines = db.OrderLines.Where(o => o.OrderId == order.Id).ToList();
+            ;
             order.OrderLines = orderLines;
 
             return order;
@@ -43,7 +44,7 @@ namespace OrderApi.Data
 
         IEnumerable<Order> IRepository<Order>.GetAll()
         {
-            IEnumerable<Order> orders =  db.Orders.ToList();
+            IEnumerable<Order> orders = db.Orders.ToList();
 
             foreach (Order order in orders)
             {
@@ -53,7 +54,6 @@ namespace OrderApi.Data
             }
 
             return orders;
-
         }
 
         void IRepository<Order>.Remove(int id)

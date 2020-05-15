@@ -31,6 +31,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CustomerApi\CustomerApi.csproj" />
+    <ProjectReference Include="..\OrderApi\OrderApi.csproj" />
+    <ProjectReference Include="..\ProductApi\ProductApi.csproj" />
   </ItemGroup>
 
 </Project>
