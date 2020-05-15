@@ -253,17 +253,23 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             Customer cust = new Customer();
 
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
             dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
                 .Returns(customers.AsQueryable().GetEnumerator());
 
-
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
             contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
-            dbSetMock.Setup(x => x.Remove(It.IsAny<Customer>()).Entity).Returns(cust);
+
+            Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+            Mock<Model> model = new Mock<Model>();
+
+            Mock<EntityEntry<Customer>> custEntry = new Mock<EntityEntry<Customer>>(new InternalShadowEntityEntry(iStateManager.Object, new EntityType("Customer", model.Object, Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+
+            dbSetMock.Setup(x => x.Remove(It.IsAny<Customer>())).Callback<Customer>(c => customers.Remove(customers.Single(s => s.Id == c.Id))).Returns(custEntry.Object);
 
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
