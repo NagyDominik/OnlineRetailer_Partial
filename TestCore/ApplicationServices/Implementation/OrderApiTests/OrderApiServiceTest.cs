@@ -2,15 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CustomerApi.Data;
-using CustomerApi.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using OrderApi.Data;
 using OrderApi.Models;
 using RestSharp.Authenticators;
-using TestCore.ApplicationServices.Implementation.CustomerApiTests;
 using Xunit;
 using Xunit.Priority;
 
@@ -22,7 +19,7 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
 
         class OrderTestData : IEnumerable<Object[]>
         {
-            private Order o1 = new Order()
+            private static Order o1 = new Order()
             {
                 Id = 1,
                 CustomerId = 2,
@@ -32,10 +29,18 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
                 {
                     new OrderLine()
                     {
-                        Id = 2,
+                        Id = 1,
                         OrderId = 1,
                         ProductId = 2,
-                        Quantity = 2,
+                        Quantity = 4,
+                        Order = new Order()
+                        {
+                            Id = o1.Id,
+                            CustomerId = o1.CustomerId,
+                            Date = o1.Date,
+                            Status = o1.Status,
+                            OrderLines = o1.OrderLines
+                        }
                     },
                     new OrderLine()
                     {
@@ -43,11 +48,19 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
                         OrderId = 1,
                         ProductId = 2,
                         Quantity = 4,
-                    },
+                        Order = new Order()
+                        {
+                            Id = o1.Id,
+                            CustomerId = o1.CustomerId,
+                            Date = o1.Date,
+                            Status = o1.Status,
+                            OrderLines = o1.OrderLines
+                        }
+                    }
                 },
             };
 
-            private Order o2 = new Order()
+            private static Order o2 = new Order()
             {
                 Id = 3,
                 CustomerId = 3,
@@ -61,6 +74,14 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
                         OrderId = 3,
                         ProductId = 5,
                         Quantity = 6,
+                        Order = new Order()
+                        {
+                            Id = o2.Id,
+                            CustomerId = o2.CustomerId,
+                            Date = o2.Date,
+                            Status = o2.Status,
+                            OrderLines = o2.OrderLines
+                        }
                     },
                     new OrderLine()
                     {
@@ -68,7 +89,15 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
                         OrderId = 5,
                         ProductId = 2,
                         Quantity = 15,
-                    },
+                        Order = new Order()
+                        {
+                            Id = o2.Id,
+                            CustomerId = o2.CustomerId,
+                            Date = o2.Date,
+                            Status = o2.Status,
+                            OrderLines = o2.OrderLines
+                        }
+                    }
                 },
             };
 
@@ -113,36 +142,36 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
         [Fact, Priority(-10)]
         public void GetAllUserTest()
         {
-            OrderTestData ordertestData = new OrderTestData();
-            var objects = ordertestData.ToList();
+            //OrderTestData ordertestData = new OrderTestData();
+            //var objects = ordertestData.ToList();
 
-            List<Customer> orders = new List<Customer>();
+            //List<Customer> orders = new List<Customer>();
 
-            foreach (var item in objects)
-            {
-                orders.Add((Customer) item[0]);
-            }
+            //foreach (var item in objects)
+            //{
+            //    orders.Add((Customer) item[0]);
+            //}
 
-            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+            //Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
 
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(orders.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(orders.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(orders.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
-                .Returns(orders.AsQueryable().GetEnumerator());
+            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(orders.AsQueryable().Provider);
+            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(orders.AsQueryable().Expression);
+            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(orders.AsQueryable().ElementType);
+            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
+            //    .Returns(orders.AsQueryable().GetEnumerator());
 
-            Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
+            //Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
-            contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+            //contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
 
-            CustomerApi.Data.IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+            //CustomerApi.Data.IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
-            List<Customer> retrievedOrders = customerRepository.GetAll().ToList();
+            //List<Customer> retrievedOrders = customerRepository.GetAll().ToList();
 
-            // Verify that the GetAll method is only called once
-            contextMock.Verify(x => x.Customers, Times.Once);
+            //// Verify that the GetAll method is only called once
+            //contextMock.Verify(x => x.Customers, Times.Once);
 
-            Assert.Equal(orders, retrievedOrders);
+            //Assert.Equal(orders, retrievedOrders);
         }
 
         #endregion
@@ -159,7 +188,7 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
 
             foreach (var item in objects)
             {
-                orders.Add((Order)item[0]);
+                orders.Add((Order) item[0]);
             }
 
             Mock<DbSet<Order>> dbSetMock = new Mock<DbSet<Order>>();
@@ -170,16 +199,16 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
                 .Returns(orders.AsQueryable().GetEnumerator());
 
 
-            //Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
+            Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
 
-            //contextMock.Setup(x => x.Orders).Returns(dbSetMock.Object);
+            contextMock.Setup(x => x.Orders).Returns(dbSetMock.Object);
 
-            //IRepository<Order> orderRepository = new OrderRepository(contextMock);
+            IRepository<Order> orderRepository = new OrderRepository(contextMock.Object);
 
-            //Customer order1 = orderRepository.Get(1);
+            Order order1 = orderRepository.Get(1);
 
-            //Assert.Equal(1, order1.Id);
-            //contextMock.Verify(x => x.Customers, Times.Once);
+            Assert.Equal(1, order1.Id);
+            contextMock.Verify(x => x.Orders, Times.Once);
         }
 
         #endregion

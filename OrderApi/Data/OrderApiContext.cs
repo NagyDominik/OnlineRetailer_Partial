@@ -5,13 +5,9 @@ namespace OrderApi.Data
 {
     public class OrderApiContext : DbContext
     {
-        public OrderApiContext(DbContextOptions<OrderApiContext> options) : base(options)
-        {
-        }
+        public OrderApiContext(DbContextOptions<OrderApiContext> options) : base(options) { }
 
-        protected OrderApiContext()
-        {
-        }
+        protected OrderApiContext() { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
