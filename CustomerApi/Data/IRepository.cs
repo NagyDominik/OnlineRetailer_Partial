@@ -8,6 +8,6 @@ namespace CustomerApi.Data
         T Get(int id);
         T Add(T entity);
         void Edit(T entity);
-        void Remove(int id);
+        T Remove(int id);
     }
 }
