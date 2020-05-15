@@ -16,11 +16,14 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
         class ProductTestData : IEnumerable<Object[]>
         {
-            private Product p1 = new Product() {Id = 1, Name = "Hammer", Price = 100, ItemsInStock = 10, ItemsReserved = 0};
+            private Product p1 = new Product()
+                {Id = 1, Name = "Hammer", Price = 100, ItemsInStock = 10, ItemsReserved = 0};
 
-            private Product p2 = new Product() {Id = 2, Name = "Screwdriver", Price = 70, ItemsInStock = 20, ItemsReserved = 0};
+            private Product p2 = new Product()
+                {Id = 2, Name = "Screwdriver", Price = 70, ItemsInStock = 20, ItemsReserved = 0};
 
-            private Product p3 = new Product() {Id = 3, Name = "Drill", Price = 500, ItemsInStock = 2, ItemsReserved = 0};
+            private Product p3 = new Product()
+                {Id = 3, Name = "Drill", Price = 500, ItemsInStock = 2, ItemsReserved = 0};
 
             public IEnumerator<object[]> GetEnumerator()
             {
@@ -35,6 +38,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
         #endregion
 
         #region GetAllProducts
+
         [Fact]
         public void GetAllProducts()
         {

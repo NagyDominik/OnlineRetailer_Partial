@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Moq;
 using Xunit;
 using Xunit.Priority;
@@ -83,31 +84,6 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
-
-        ///**
-        //     * TestDb setup
-        //     */
-        //private async Task<CustomerApiContext> GetDatabaseContext()
-        //{
-        //    CustomerTestData testData = new CustomerTestData();
-        //    var objects = testData.ToList();
-        //    var options = new DbContextOptionsBuilder<CustomerApiContext>()
-        //        .UseInMemoryDatabase(databaseName: "CustomersTestDb")
-        //        .Options;
-        //    var databaseContext = new CustomerApiContext(options);
-        //    databaseContext.Database.EnsureCreated();
-        //    if (await databaseContext.Customers.CountAsync() <= 0)
-        //    {
-        //        foreach (var item in objects)
-        //        {
-        //            databaseContext.Customers.Add((Customer) item[0]);
-        //        }
-
-        //        await databaseContext.SaveChangesAsync();
-        //    }
-
-        //    return databaseContext;
-        //}
 
         #endregion
 
@@ -275,30 +251,50 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             var c1 = customers[0];
             customerRepository.Remove(c1.Id);
-            Assert.DoesNotContain(c1, customers);
 
-            contextMock.Verify(x => x.Customers, Times.Once);
+            //contextMock.Verify(x => x.Customers, Times.Once);
+            contextMock.Verify(x => x.Remove(c1.Id), Times.Once);
         }
 
         #endregion
 
         [Theory, Priority(0)]
         [ClassData(typeof(CustomerUpdateData))]
-        public async void UpdateUserTest(Customer customer)
+        public  void UpdateUserTest(Customer customer)
         {
-           //// var dbContext = await GetDatabaseContext();
-           // //IRepository<Customer> repo = new CustomerRepository(dbContext);
+            CustomerTestData testData = new CustomerTestData();
+            var objects = testData.ToList();
 
-           //// var customerUpdate = repo.Get(customer.Id);
+            List<Customer> customers = new List<Customer>();
+
+            foreach (var item in objects)
+            {
+                customers.Add((Customer)item[0]);
+            }
+            Customer cust = new Customer();
+
+            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
+            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
+                .Returns(customers.AsQueryable().GetEnumerator());
+            Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
+
+            contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+            dbSetMock.Setup(x => x.Update(It.IsAny<Customer>()));
+            IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+
+            Customer customerUpdate = customerRepository.Get(customers[0].Id);
 
            // // updating an existing customer
-           // customerUpdate.CreditStanding = customer.CreditStanding;
-           // customerUpdate.Email = customer.Email;
-           // customerUpdate.BillingAddress = customer.BillingAddress;
-           // customerUpdate.Name = customer.Name;
+           customerUpdate.CreditStanding = customer.CreditStanding;
+           customerUpdate.Email = customer.Email;
+           customerUpdate.BillingAddress = customer.BillingAddress;
+           customerUpdate.Name = customer.Name;
 
-           // repo.Edit(customerUpdate);
-           // Assert.Equal(customer.Email, customerUpdate.Email);
+           customerRepository.Edit(customerUpdate);
+           Assert.Equal(customer.Email, customerUpdate.Email);
         }
     }
 }
