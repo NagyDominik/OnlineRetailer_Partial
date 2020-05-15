@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Moq;
 using ProductApi.Data;
 using ProductApi.Models;
@@ -64,7 +67,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
             contextMock.Setup(x => x.Products).Returns(dbSetMock.Object);
 
-            IRepository<Product> productRepository = new ProductRepository(contextMock.Object);
+            ProductApi.Data.IRepository<Product> productRepository = new ProductRepository(contextMock.Object);
 
             List<Product> retrievedProducts = productRepository.GetAll().ToList();
 
@@ -103,12 +106,55 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
             contextMock.Setup(x => x.Products).Returns(dbSetMock.Object);
 
-            IRepository<Product> productRepository = new ProductRepository(contextMock.Object);
+            ProductApi.Data.IRepository<Product> productRepository = new ProductRepository(contextMock.Object);
 
             Product prod1 = productRepository.Get(1);
 
             Assert.Equal(1, prod1.Id);
             contextMock.Verify(x => x.Products, Times.Once);
+        }
+
+        #endregion
+
+        #region CreateProductTest
+        [Fact]
+        public void AddProduct()
+        {
+            ProductTestData testData = new ProductTestData();
+            var objects = testData.ToList();
+
+            List<Product> products = new List<Product>();
+
+            foreach (var item in objects)
+            {
+                products.Add((Product)item[0]);
+            }
+
+            Product newProduct = new Product() { Id = 4, Name = "HammerTime", Price = 1200, ItemsInStock = 130, ItemsReserved = 10};
+
+            Mock<DbSet<Product>> dbSetMock = new Mock<DbSet<Product>>();
+            Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
+
+            contextMock.Setup(x => x.Products).Returns(dbSetMock.Object);
+
+            // Create a mock EntityEntry<Customer>
+            Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+            Mock<Model> model = new Mock<Model>();
+
+            Mock<EntityEntry<Product>> custEntry = new Mock<EntityEntry<Product>>(
+                new InternalShadowEntityEntry(iStateManager.Object,
+                    new EntityType("Product", model.Object,
+                        Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+
+            dbSetMock.Setup(x => x.Add(It.IsAny<Product>())).Callback<Product>(p => products.Add(p))
+                .Returns(custEntry.Object);
+
+            IRepository<Product> p = new ProductRepository(contextMock.Object);
+
+            Product addedProduct = p.Add(newProduct);
+            
+            Assert.Equal(newProduct, products[3]);
+            dbSetMock.Verify(x => x.Add(newProduct), Times.Once);
         }
 
         #endregion

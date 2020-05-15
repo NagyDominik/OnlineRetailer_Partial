@@ -110,37 +110,12 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        ///**
-        //     * TestDb setup
-        //     */
-        //private async Task<CustomerApiContext> GetDatabaseContext()
-        //{
-        //    CustomerTestData testData = new CustomerTestData();
-        //    var objects = testData.ToList();
-        //    var options = new DbContextOptionsBuilder<CustomerApiContext>()
-        //        .UseInMemoryDatabase(databaseName: "CustomersTestDb")
-        //        .Options;
-        //    var databaseContext = new CustomerApiContext(options);
-        //    databaseContext.Database.EnsureCreated();
-        //    if (await databaseContext.Customers.CountAsync() <= 0)
-        //    {
-        //        foreach (var item in objects)
-        //        {
-        //            databaseContext.Customers.Add((Customer) item[0]);
-        //        }
-
-        //        await databaseContext.SaveChangesAsync();
-        //    }
-
-        //    return databaseContext;
-        //}
-
         #endregion
 
         #region GetAllCustomer
 
-        [Fact, Priority(-10)]
-        public void GetAllUserTest()
+        [Fact]
+        public void GetAllOrderTest()
         {
             //OrderTestData ordertestData = new OrderTestData();
             //var objects = ordertestData.ToList();
@@ -176,9 +151,9 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
 
         #endregion
 
-        #region GetCustomerByID
+        #region GetOrderByID
 
-        [Fact, Priority(0)]
+        [Fact]
         public void GetCustomerByIdTest()
         {
             OrderTestData ordertestData = new OrderTestData();
