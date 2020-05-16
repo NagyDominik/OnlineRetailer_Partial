@@ -7,16 +7,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using Xunit;
-using Xunit.Priority;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
+namespace TestCore.ApplicationRepositories.Implementation.CustomerApiTests
 {
     public class CustomerApiRepositoryTest
     {
         private MockHelper helper = new MockHelper();
+        private List<Customer> customers;
 
         #region MockData
 
@@ -65,12 +65,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        #endregion
-
-        #region GetAllCustomer
-
-        [Fact]
-        public void GetAllUserTest()
+        public List<Customer> LoadCustomers()
         {
             CustomerTestData testData = new CustomerTestData();
             var objects = testData.ToList();
@@ -81,6 +76,18 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             {
                 customers.Add((Customer) item[0]);
             }
+
+            return customers;
+        }
+
+        #endregion
+
+        #region GetAllCustomer
+
+        [Fact]
+        public void GetAllUserTest()
+        {
+            List<Customer> customers = LoadCustomers();
 
             Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
@@ -105,15 +112,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         [Fact]
         public void GetCustomerByIdTest()
         {
-            CustomerTestData testData = new CustomerTestData();
-            var objects = testData.ToList();
-
-            List<Customer> customers = new List<Customer>();
-
-            foreach (var item in objects)
-            {
-                customers.Add((Customer) item[0]);
-            }
+            List<Customer> customers = LoadCustomers();
 
             Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
@@ -136,15 +135,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         [Fact]
         public void AddCustomer()
         {
-            CustomerTestData testData = new CustomerTestData();
-            var objects = testData.ToList();
-
-            List<Customer> customers = new List<Customer>();
-
-            foreach (var item in objects)
-            {
-                customers.Add((Customer) item[0]);
-            }
+            List<Customer> customers = LoadCustomers();
 
             Customer newCustomer = new Customer()
             {
@@ -189,18 +180,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         [Fact]
         public void DeleteCustomer()
         {
-            CustomerTestData testData = new CustomerTestData();
-            var objects = testData.ToList();
-
-            List<Customer> customers = new List<Customer>();
-
-            foreach (var item in objects)
-            {
-                customers.Add((Customer) item[0]);
-            }
-
-            Customer cust = new Customer();
-
+            List<Customer> customers = LoadCustomers();
 
             Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
@@ -236,6 +216,8 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         [ClassData(typeof(CustomerTestData))]
         public void UpdateCustomerTest(Customer customer)
         {
+            List<Customer> customers = LoadCustomers();
+
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
@@ -255,10 +237,12 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
 
-            // // updating an existing customer
-            customer.Email = "asd1@asd1.com";
+            // updating an existing customer
+            // CreditStanding is the only property that can be Updated.
+            customers[0].CreditStanding = false;
 
-            customerRepository.Edit(customer);
+            //Throws a NullReferenceException when it reach the edit method in the repo.
+            customerRepository.Edit(customers[0]);
             Assert.Equal(customer.Email, customer.Email);
         }
     }

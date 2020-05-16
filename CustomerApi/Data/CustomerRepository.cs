@@ -24,7 +24,7 @@ namespace CustomerApi.Data
 
         void IRepository<Customer>.Edit(Customer entity)
         {
-            db.Entry(entity).State = EntityState.Modified;
+            db.Attach(entity).State = EntityState.Modified;
             db.SaveChanges();
         }
 

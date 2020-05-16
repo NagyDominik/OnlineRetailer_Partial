@@ -11,11 +11,12 @@ using ProductApi.Data;
 using ProductApi.Models;
 using Xunit;
 
-namespace TestCore.ApplicationServices.Implementation.ProductApiTests
+namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
 {
     public class ProductApiRepositoryTest
     {
         readonly MockHelper helper = new MockHelper();
+        private List<Product> products;
 
         #region MockData
 
@@ -39,13 +40,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
-
-        #endregion
-
-        #region GetAllProductsTest
-
-        [Fact]
-        public void GetAllProductsTest()
+        public List<Product> LoadCustomers()
         {
             ProductTestData testData = new ProductTestData();
             var objects = testData.ToList();
@@ -54,8 +49,20 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
             foreach (var item in objects)
             {
-                products.Add((Product) item[0]);
+                products.Add((Product)item[0]);
             }
+
+            return products;
+        }
+
+        #endregion
+
+        #region GetAllProductsTest
+
+        [Fact]
+        public void GetAllProductsTest()
+        {
+            List<Product> products = LoadCustomers();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
@@ -80,15 +87,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
         [Fact]
         public void GetProductByIdTest()
         {
-            ProductTestData testData = new ProductTestData();
-            var objects = testData.ToList();
-
-            List<Product> products = new List<Product>();
-
-            foreach (var item in objects)
-            {
-                products.Add((Product) item[0]);
-            }
+            List<Product> products = LoadCustomers();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
@@ -111,15 +110,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
         [Fact]
         public void AddProduct()
         {
-            ProductTestData testData = new ProductTestData();
-            var objects = testData.ToList();
-
-            List<Product> products = new List<Product>();
-
-            foreach (var item in objects)
-            {
-                products.Add((Product) item[0]);
-            }
+            List<Product> products = LoadCustomers();
 
             Product newProduct = new Product()
                 {Id = 4, Name = "HammerTime", Price = 1200, ItemsInStock = 130, ItemsReserved = 10};
@@ -156,15 +147,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
         [Fact]
         public void DeleteProductTest()
         {
-            ProductTestData testData = new ProductTestData();
-            var objects = testData.ToList();
-
-            List<Product> products = new List<Product>();
-
-            foreach (var item in objects)
-            {
-                products.Add((Product) item[0]);
-            }
+            List<Product> products = LoadCustomers();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 

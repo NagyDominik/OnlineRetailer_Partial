@@ -8,7 +8,7 @@ using OrderApi.Data;
 using OrderApi.Models;
 using Xunit;
 
-namespace TestCore.ApplicationServices.Implementation.OrderApiTests
+namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
 {
     public class OrderApiRepositoryTest
     {
