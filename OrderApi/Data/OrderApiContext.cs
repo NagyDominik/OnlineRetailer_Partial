@@ -6,7 +6,7 @@ namespace OrderApi.Data
     public class OrderApiContext : DbContext
     {
         public OrderApiContext(DbContextOptions<OrderApiContext> options) : base(options) { }
-
+        // empty constructor for test environment
         protected OrderApiContext() { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,7 +20,6 @@ namespace OrderApi.Data
                 .WithMany(o => o.OrderLines)
                 .HasForeignKey(ol => ol.OrderId);
         }
-
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderLine> OrderLines { get; set; }
     }

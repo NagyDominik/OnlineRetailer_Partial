@@ -13,8 +13,10 @@ using Xunit;
 
 namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 {
-    public class ProductApiServiceTest
+    public class ProductApiRepositoryTest
     {
+        readonly MockHelper helper = new MockHelper();
+
         #region MockData
 
         class ProductTestData : IEnumerable<Object[]>
@@ -40,10 +42,10 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
         #endregion
 
-        #region GetAllProducts
+        #region GetAllProductsTest
 
         [Fact]
-        public void GetAllProducts()
+        public void GetAllProductsTest()
         {
             ProductTestData testData = new ProductTestData();
             var objects = testData.ToList();
@@ -55,13 +57,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
                 products.Add((Product) item[0]);
             }
 
-            Mock<DbSet<Product>> dbSetMock = new Mock<DbSet<Product>>();
-
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.Provider).Returns(products.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.Expression).Returns(products.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.ElementType).Returns(products.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.GetEnumerator())
-                .Returns(products.AsQueryable().GetEnumerator());
+            Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
             Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
 
@@ -94,13 +90,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
                 products.Add((Product) item[0]);
             }
 
-            Mock<DbSet<Product>> dbSetMock = new Mock<DbSet<Product>>();
-
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.Provider).Returns(products.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.Expression).Returns(products.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.ElementType).Returns(products.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Product>>().Setup(x => x.GetEnumerator())
-                .Returns(products.AsQueryable().GetEnumerator());
+            Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
             Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
 
@@ -117,6 +107,7 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
         #endregion
 
         #region CreateProductTest
+
         [Fact]
         public void AddProduct()
         {
@@ -127,10 +118,11 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
 
             foreach (var item in objects)
             {
-                products.Add((Product)item[0]);
+                products.Add((Product) item[0]);
             }
 
-            Product newProduct = new Product() { Id = 4, Name = "HammerTime", Price = 1200, ItemsInStock = 130, ItemsReserved = 10};
+            Product newProduct = new Product()
+                {Id = 4, Name = "HammerTime", Price = 1200, ItemsInStock = 130, ItemsReserved = 10};
 
             Mock<DbSet<Product>> dbSetMock = new Mock<DbSet<Product>>();
             Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
@@ -152,9 +144,53 @@ namespace TestCore.ApplicationServices.Implementation.ProductApiTests
             IRepository<Product> p = new ProductRepository(contextMock.Object);
 
             Product addedProduct = p.Add(newProduct);
-            
+
             Assert.Equal(newProduct, products[3]);
             dbSetMock.Verify(x => x.Add(newProduct), Times.Once);
+        }
+
+        #endregion
+
+        #region DeleteProductTest
+
+        [Fact]
+        public void DeleteProductTest()
+        {
+            ProductTestData testData = new ProductTestData();
+            var objects = testData.ToList();
+
+            List<Product> products = new List<Product>();
+
+            foreach (var item in objects)
+            {
+                products.Add((Product) item[0]);
+            }
+
+            Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
+
+            Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
+
+            contextMock.Setup(x => x.Products).Returns(dbSetMock.Object);
+
+            Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+            Mock<Model> model = new Mock<Model>();
+
+            Mock<EntityEntry<Product>> custEntry = new Mock<EntityEntry<Product>>(
+                new InternalShadowEntityEntry(iStateManager.Object,
+                    new EntityType("Product", model.Object,
+                        Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+
+            dbSetMock.Setup(x => x.Remove(It.IsAny<Product>()))
+                .Callback<Product>(c => products.Remove(products.Single(s => s.Id == c.Id))).Returns(custEntry.Object);
+
+            IRepository<Product> productRepository = new ProductRepository(contextMock.Object);
+
+            var p1 = products[0];
+            productRepository.Remove(p1.Id);
+
+            //contextMock.Verify(x => x.Customers, Times.Once);
+            Assert.DoesNotContain(p1, products);
+            dbSetMock.Verify(x => x.Remove(p1), Times.Once);
         }
 
         #endregion

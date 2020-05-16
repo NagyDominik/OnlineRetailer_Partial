@@ -14,8 +14,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 {
-    public class CustomerApiServiceTest
+    public class CustomerApiRepositoryTest
     {
+        private MockHelper helper = new MockHelper();
+
         #region MockData
 
         class CustomerTestData : IEnumerable<Object[]>
@@ -63,27 +65,6 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        class CustomerUpdateData : IEnumerable<Object[]>
-        {
-            private Customer c1 = new Customer()
-            {
-                Id = 1,
-                Name = "Johnny SmithUpdate",
-                Email = "johny@hotmail.comUpdate",
-                PhoneNumber = "+45525487",
-                BillingAddress = "John Street 05Update",
-                ShippingAddress = "John Street 09Update",
-                CreditStanding = false
-            };
-
-            public IEnumerator<object[]> GetEnumerator()
-            {
-                yield return new object[] {c1};
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
-
         #endregion
 
         #region GetAllCustomer
@@ -101,13 +82,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                 customers.Add((Customer) item[0]);
             }
 
-            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
-
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
-                .Returns(customers.AsQueryable().GetEnumerator());
+            Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
@@ -140,13 +115,7 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                 customers.Add((Customer) item[0]);
             }
 
-            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
-                .Returns(customers.AsQueryable().GetEnumerator());
-
+            Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
@@ -232,13 +201,8 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
 
             Customer cust = new Customer();
 
-            Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
 
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(customers.AsQueryable().Provider);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(customers.AsQueryable().Expression);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(customers.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
-                .Returns(customers.AsQueryable().GetEnumerator());
+            Mock<DbSet<Customer>> dbSetMock = helper.GetQueryableMockDbSet(customers.ToArray());
 
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
@@ -247,9 +211,14 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             Mock<IStateManager> iStateManager = new Mock<IStateManager>();
             Mock<Model> model = new Mock<Model>();
 
-            Mock<EntityEntry<Customer>> custEntry = new Mock<EntityEntry<Customer>>(new InternalShadowEntityEntry(iStateManager.Object, new EntityType("Customer", model.Object, Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+            Mock<EntityEntry<Customer>> custEntry = new Mock<EntityEntry<Customer>>(
+                new InternalShadowEntityEntry(iStateManager.Object,
+                    new EntityType("Customer", model.Object,
+                        Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
 
-            dbSetMock.Setup(x => x.Remove(It.IsAny<Customer>())).Callback<Customer>(c => customers.Remove(customers.Single(s => s.Id == c.Id))).Returns(custEntry.Object);
+            dbSetMock.Setup(x => x.Remove(It.IsAny<Customer>()))
+                .Callback<Customer>(c => customers.Remove(customers.Single(s => s.Id == c.Id)))
+                .Returns(custEntry.Object);
 
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
@@ -264,19 +233,9 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
         #endregion
 
         [Theory]
-        [ClassData(typeof(CustomerUpdateData))]
-        public void UpdateUserTest(Customer customer)
+        [ClassData(typeof(CustomerTestData))]
+        public void UpdateCustomerTest(Customer customer)
         {
-            CustomerTestData testData = new CustomerTestData();
-            var objects = testData.ToList();
-
-            List<Customer> customers = new List<Customer>();
-
-            foreach (var item in objects)
-            {
-                customers.Add((Customer) item[0]);
-            }
-            
             Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
             Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
 
@@ -291,21 +250,16 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
                     new EntityType("Customer", model.Object,
                         Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
 
-            dbSetMock.Setup(x => x.Update(It.IsAny<Customer>())).Callback<Customer>(c => customers.Add(c))
-                .Returns(custEntry.Object);
+            dbSetMock.Setup(x => x.Update(It.IsAny<Customer>()));
 
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
-            Customer customerUpdate = customerRepository.Get(customers[0].Id);
 
             // // updating an existing customer
-            customerUpdate.CreditStanding = customer.CreditStanding;
-            customerUpdate.Email = customer.Email;
-            customerUpdate.BillingAddress = customer.BillingAddress;
-            customerUpdate.Name = customer.Name;
+            customer.Email = "asd1@asd1.com";
 
-            customerRepository.Edit(customerUpdate);
-            Assert.Equal(customer.Email, customerUpdate.Email);
+            customerRepository.Edit(customer);
+            Assert.Equal(customer.Email, customer.Email);
         }
     }
 }
