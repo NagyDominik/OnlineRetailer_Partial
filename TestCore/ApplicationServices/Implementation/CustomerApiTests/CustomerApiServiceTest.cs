@@ -252,7 +252,6 @@ namespace TestCore.ApplicationServices.Implementation.CustomerApiTests
             var c1 = customers[0];
             customerRepository.Remove(c1.Id);
 
-            //contextMock.Verify(x => x.Customers, Times.Once);
             Assert.DoesNotContain(c1, customers);
             dbSetMock.Verify(x => x.Remove(c1), Times.Once);
         }
