@@ -13,7 +13,7 @@ namespace OrderApi.Data
         {
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderLines)
-                .WithOne(ol => ol.Order);
+                .WithOne(ol => ol.Order).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<OrderLine>()
                 .HasOne(ol => ol.Order)

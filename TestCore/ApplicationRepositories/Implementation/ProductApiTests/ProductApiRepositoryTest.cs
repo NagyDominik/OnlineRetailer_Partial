@@ -15,9 +15,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
 {
     public class ProductApiRepositoryTest
     {
-        readonly MockHelper helper = new MockHelper();
-        private List<Product> products;
-
+        private readonly MockHelper helper = new MockHelper();
         #region MockData
 
         class ProductTestData : IEnumerable<Object[]>
@@ -40,7 +38,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
-        public List<Product> LoadCustomers()
+        public List<Product> LoadProducts()
         {
             ProductTestData testData = new ProductTestData();
             var objects = testData.ToList();
@@ -62,7 +60,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
         [Fact]
         public void GetAllProductsTest()
         {
-            List<Product> products = LoadCustomers();
+            List<Product> products = LoadProducts();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
@@ -87,7 +85,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
         [Fact]
         public void GetProductByIdTest()
         {
-            List<Product> products = LoadCustomers();
+            List<Product> products = LoadProducts();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
@@ -110,7 +108,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
         [Fact]
         public void AddProduct()
         {
-            List<Product> products = LoadCustomers();
+            List<Product> products = LoadProducts();
 
             Product newProduct = new Product()
                 {Id = 4, Name = "HammerTime", Price = 1200, ItemsInStock = 130, ItemsReserved = 10};
@@ -147,7 +145,7 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
         [Fact]
         public void DeleteProductTest()
         {
-            List<Product> products = LoadCustomers();
+            List<Product> products = LoadProducts();
 
             Mock<DbSet<Product>> dbSetMock = helper.GetQueryableMockDbSet(products.ToArray());
 
