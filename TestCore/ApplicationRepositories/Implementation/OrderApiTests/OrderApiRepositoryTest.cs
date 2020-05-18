@@ -19,6 +19,7 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
 
         #region MockData
 
+
         class OrderTestData : IEnumerable<Object[]>
         {
             private static Order o1 = new Order()
@@ -27,7 +28,9 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
                 CustomerId = 2,
                 Date = DateTime.Now.AddDays(-1),
                 Status = Status.Completed,
+                OrderLines = new List<OrderLine>()
             };
+
 
             private static Order o2 = new Order()
             {
@@ -35,10 +38,47 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
                 CustomerId = 3,
                 Date = DateTime.Now.AddDays(-1),
                 Status = Status.Shipped,
+                OrderLines = new List<OrderLine>()
             };
+
 
             public IEnumerator<object[]> GetEnumerator()
             {
+                o1.OrderLines.Add(new OrderLine() { 
+                    Id = 1,
+                    OrderId = 1,
+                    ProductId = 1,
+                    Quantity = 2,
+                    Order = o1
+                });
+                o1.OrderLines.Add(new OrderLine()
+                {
+                    Id = 2,
+                    OrderId = 2,
+                    ProductId = 4,
+                    Quantity = 15,
+                    Order = o1
+                });
+
+
+                o2.OrderLines.Add(new OrderLine()
+                {
+                    Id = 1,
+                    OrderId = 3,
+                    ProductId = 5,
+                    Quantity = 6,
+                    Order = o2
+                });
+
+                o2.OrderLines.Add(new OrderLine()
+                {
+                    Id = 2,
+                    OrderId = 5,
+                    ProductId = 2,
+                    Quantity = 15,
+                    Order = o2
+                });
+
                 yield return new object[] {o1};
                 yield return new object[] {o2};
             }

@@ -36,7 +36,7 @@ namespace OrderApi.Data
             Order order = db.Orders.FirstOrDefault(o => o.Id == id);
 
             List<OrderLine> orderLines = db.OrderLines.Where(o => o.OrderId == order.Id).ToList();
-            ;
+
             order.OrderLines = orderLines;
 
             return order;
