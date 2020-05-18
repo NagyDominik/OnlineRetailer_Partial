@@ -22,7 +22,7 @@ namespace OrderApi
         private readonly Uri productServiceUri = new Uri("http://productapi/products/");
         private readonly Uri customerServiceUri = new Uri("http://customerapi/customers/");
 #endif
-        private readonly string cloudAMQPconnectionString = Environment.GetEnvironmentVariable("CloudAMQP");
+        private readonly string cloudAMQPconnectionString = "host=hawk.rmq.cloudamqp.com;virtualHost=lupcpmxk;username=lupcpmxk;password=V50BilRpuuPrQ33ZeRKj0Flq5XAGG0sb";
 
         public Startup(IConfiguration configuration)
         {
