@@ -14,6 +14,7 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
     {
         #region MockData
 
+
         class OrderTestData : IEnumerable<Object[]>
         {
             private static Order o1 = new Order()
@@ -23,39 +24,8 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
                 Date = DateTime.Now.AddDays(-1),
                 Status = Status.Completed,
                 OrderLines = new List<OrderLine>()
-                {
-                    new OrderLine()
-                    {
-                        Id = 1,
-                        OrderId = 1,
-                        ProductId = 2,
-                        Quantity = 4,
-                        Order = new Order()
-                        {
-                            Id = o1.Id,
-                            CustomerId = o1.CustomerId,
-                            Date = o1.Date,
-                            Status = o1.Status,
-                            OrderLines = o1.OrderLines
-                        }
-                    },
-                    new OrderLine()
-                    {
-                        Id = 1,
-                        OrderId = 1,
-                        ProductId = 2,
-                        Quantity = 4,
-                        Order = new Order()
-                        {
-                            Id = o1.Id,
-                            CustomerId = o1.CustomerId,
-                            Date = o1.Date,
-                            Status = o1.Status,
-                            OrderLines = o1.OrderLines
-                        }
-                    }
-                },
             };
+
 
             private static Order o2 = new Order()
             {
@@ -64,42 +34,46 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
                 Date = DateTime.Now.AddDays(-1),
                 Status = Status.Shipped,
                 OrderLines = new List<OrderLine>()
-                {
-                    new OrderLine()
-                    {
-                        Id = 1,
-                        OrderId = 3,
-                        ProductId = 5,
-                        Quantity = 6,
-                        Order = new Order()
-                        {
-                            Id = o2.Id,
-                            CustomerId = o2.CustomerId,
-                            Date = o2.Date,
-                            Status = o2.Status,
-                            OrderLines = o2.OrderLines
-                        }
-                    },
-                    new OrderLine()
-                    {
-                        Id = 2,
-                        OrderId = 5,
-                        ProductId = 2,
-                        Quantity = 15,
-                        Order = new Order()
-                        {
-                            Id = o2.Id,
-                            CustomerId = o2.CustomerId,
-                            Date = o2.Date,
-                            Status = o2.Status,
-                            OrderLines = o2.OrderLines
-                        }
-                    }
-                },
             };
+
 
             public IEnumerator<object[]> GetEnumerator()
             {
+                o1.OrderLines.Add(new OrderLine() { 
+                    Id = 1,
+                    OrderId = 1,
+                    ProductId = 1,
+                    Quantity = 2,
+                    Order = o1
+                });
+                o1.OrderLines.Add(new OrderLine()
+                {
+                    Id = 2,
+                    OrderId = 2,
+                    ProductId = 4,
+                    Quantity = 15,
+                    Order = o1
+                });
+
+
+                o2.OrderLines.Add(new OrderLine()
+                {
+                    Id = 1,
+                    OrderId = 3,
+                    ProductId = 5,
+                    Quantity = 6,
+                    Order = o2
+                });
+
+                o2.OrderLines.Add(new OrderLine()
+                {
+                    Id = 2,
+                    OrderId = 5,
+                    ProductId = 2,
+                    Quantity = 15,
+                    Order = o2
+                });
+
                 yield return new object[] {o1};
                 yield return new object[] {o2};
             }
@@ -167,16 +141,29 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
             dbSetMock.As<IQueryable<Order>>().Setup(x => x.Provider).Returns(orders.AsQueryable().Provider);
             dbSetMock.As<IQueryable<Order>>().Setup(x => x.Expression).Returns(orders.AsQueryable().Expression);
             dbSetMock.As<IQueryable<Order>>().Setup(x => x.ElementType).Returns(orders.AsQueryable().ElementType);
-            dbSetMock.As<IQueryable<Order>>().Setup(x => x.GetEnumerator())
-                .Returns(orders.AsQueryable().GetEnumerator());
+            dbSetMock.As<IQueryable<Order>>().Setup(x => x.GetEnumerator()).Returns(orders.AsQueryable().GetEnumerator());
 
+            //Get OrderLines to create a mock OrderLine dbSet
+            List<OrderLine> orderLines = new List<OrderLine>();
+            foreach (Order order in orders)
+            {
+                orderLines.AddRange(order.OrderLines);
+            }
+
+            Mock<DbSet<OrderLine>> orderLineMock = new Mock<DbSet<OrderLine>>();
+
+            orderLineMock.As<IQueryable<OrderLine>>().Setup(x => x.Provider).Returns(orderLines.AsQueryable().Provider);
+            orderLineMock.As<IQueryable<OrderLine>>().Setup(x => x.Expression).Returns(orderLines.AsQueryable().Expression);
+            orderLineMock.As<IQueryable<OrderLine>>().Setup(x => x.ElementType).Returns(orderLines.AsQueryable().ElementType);
+            orderLineMock.As<IQueryable<OrderLine>>().Setup(x => x.GetEnumerator()).Returns(orderLines.AsQueryable().GetEnumerator());
 
             Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
 
             contextMock.Setup(x => x.Orders).Returns(dbSetMock.Object);
+            contextMock.Setup(x => x.OrderLines).Returns(orderLineMock.Object);
 
             IRepository<Order> orderRepository = new OrderRepository(contextMock.Object);
-
+            
             Order order1 = orderRepository.Get(1);
 
             Assert.Equal(1, order1.Id);
