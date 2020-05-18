@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFrameworkCore3Mock.Moq" Version="1.0.0.3" />
-    <PackageReference Include="EntityFrameworkCore3Mock.NSubstitute" Version="1.0.0.3" />
-    <PackageReference Include="EntityFrameworkCore3Mock.Shared" Version="1.0.0.3" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="EntityFrameworkCoreMock.Moq" Version="1.0.0.30" />
     <PackageReference Include="EntityFrameworkCoreMock.Shared" Version="1.0.0.30" />
     <PackageReference Include="EntityFrameworkMock.Moq" Version="1.0.0.63" />

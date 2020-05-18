@@ -2,18 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using OrderApi.Data;
 using OrderApi.Models;
-using RestSharp.Authenticators;
 using Xunit;
-using Xunit.Priority;
 
-namespace TestCore.ApplicationServices.Implementation.OrderApiTests
+namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
 {
-    public class OrderApiServiceTest
+    public class OrderApiRepositoryTest
     {
         #region MockData
 
@@ -110,76 +107,51 @@ namespace TestCore.ApplicationServices.Implementation.OrderApiTests
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        ///**
-        //     * TestDb setup
-        //     */
-        //private async Task<CustomerApiContext> GetDatabaseContext()
-        //{
-        //    CustomerTestData testData = new CustomerTestData();
-        //    var objects = testData.ToList();
-        //    var options = new DbContextOptionsBuilder<CustomerApiContext>()
-        //        .UseInMemoryDatabase(databaseName: "CustomersTestDb")
-        //        .Options;
-        //    var databaseContext = new CustomerApiContext(options);
-        //    databaseContext.Database.EnsureCreated();
-        //    if (await databaseContext.Customers.CountAsync() <= 0)
-        //    {
-        //        foreach (var item in objects)
-        //        {
-        //            databaseContext.Customers.Add((Customer) item[0]);
-        //        }
-
-        //        await databaseContext.SaveChangesAsync();
-        //    }
-
-        //    return databaseContext;
-        //}
-
         #endregion
 
         #region GetAllCustomer
 
-        [Fact, Priority(-10)]
-        public void GetAllUserTest()
+        [Fact]
+        public void GetAllOrderTest()
         {
-            //OrderTestData ordertestData = new OrderTestData();
-            //var objects = ordertestData.ToList();
+            //OrderTestData orderTestData = new OrderTestData();
+            //var objects = orderTestData.ToList();
 
             //List<Customer> orders = new List<Customer>();
 
             //foreach (var item in objects)
             //{
-            //    orders.Add((Customer) item[0]);
+            //    orders.Add((Order) item[0]);
             //}
 
-            //Mock<DbSet<Customer>> dbSetMock = new Mock<DbSet<Customer>>();
+            //Mock<DbSet<Order>> dbSetMock = new Mock<DbSet<Order>>();
 
-            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Provider).Returns(orders.AsQueryable().Provider);
-            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.Expression).Returns(orders.AsQueryable().Expression);
-            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.ElementType).Returns(orders.AsQueryable().ElementType);
-            //dbSetMock.As<IQueryable<Customer>>().Setup(x => x.GetEnumerator())
+            //dbSetMock.As<IQueryable<Order>>().Setup(x => x.Provider).Returns(orders.AsQueryable().Provider);
+            //dbSetMock.As<IQueryable<Order>>().Setup(x => x.Expression).Returns(orders.AsQueryable().Expression);
+            //dbSetMock.As<IQueryable<Order>>().Setup(x => x.ElementType).Returns(orders.AsQueryable().ElementType);
+            //dbSetMock.As<IQueryable<Order>>().Setup(x => x.GetEnumerator())
             //    .Returns(orders.AsQueryable().GetEnumerator());
 
-            //Mock<CustomerApiContext> contextMock = new Mock<CustomerApiContext>();
+            //Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
 
-            //contextMock.Setup(x => x.Customers).Returns(dbSetMock.Object);
+            //contextMock.Setup(x => x.Orders).Returns(dbSetMock.Object);
 
-            //CustomerApi.Data.IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
+            //IRepository<Order> orderRepository = new OrderRepository(contextMock.Object);
 
-            //List<Customer> retrievedOrders = customerRepository.GetAll().ToList();
+            //List<Order> retrievedOrders = orderRepository.GetAll().ToList();
 
             //// Verify that the GetAll method is only called once
-            //contextMock.Verify(x => x.Customers, Times.Once);
+            //contextMock.Verify(x => x.Orders, Times.Once);
 
             //Assert.Equal(orders, retrievedOrders);
         }
 
         #endregion
 
-        #region GetCustomerByID
+        #region GetOrderByID
 
-        [Fact, Priority(0)]
-        public void GetCustomerByIdTest()
+        [Fact]
+        public void GetOrderByIdTest()
         {
             OrderTestData ordertestData = new OrderTestData();
             var objects = ordertestData.ToList();

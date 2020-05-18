@@ -9,5 +9,13 @@ namespace CustomerApi.Data
         //empty constructor for test environment 
         protected CustomerApiContext() { }
         public virtual DbSet<Customer> Customers { get; set; }
+
+        /**
+         * It is supposed to set EntityState of an entity to Modified.
+         */
+        public void SetModified(Customer entity)
+        {
+            Entry(entity).State = EntityState.Modified;
+        }
     }
 }
