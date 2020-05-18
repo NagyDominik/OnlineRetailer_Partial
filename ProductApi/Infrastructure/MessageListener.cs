@@ -72,6 +72,8 @@ namespace ProductApi.Infrastructure
                     product.ItemsReserved -= orderLine.Quantity;
                     productRepos.Edit(product);
                 }
+
+                
             }
         }
 

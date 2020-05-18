@@ -22,11 +22,11 @@ namespace OrderApi.Controllers
 
         public OrdersController(IRepository<Order> repos, IServiceGateway<ProductDTO> prudoctGateway, IServiceGateway<CustomerDTO> customerGateway, IMessagePublisher publisher)
         {
-            repository = repos;
-            productServiceGateway = prudoctGateway;
-            customerServiceGateway = customerGateway;
-            messagePublisher = publisher;
-            converter = new DataConverter();
+            this.repository = repos;
+            this.productServiceGateway = prudoctGateway;
+            this.customerServiceGateway = customerGateway;
+            this.messagePublisher = publisher;
+            this.converter = new DataConverter();
         }
 
         // GET: orders

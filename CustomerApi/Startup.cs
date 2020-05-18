@@ -1,61 +1,38 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CustomerApi.Data;
 using CustomerApi.Infrastructure;
 using CustomerApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CustomerApi
 {
     public class Startup
     {
-        private IWebHostEnvironment _env { get; set; }
-        private IConfiguration _conf { get; }
+        private string cloudAMQPConnectionString = "host=hawk.rmq.cloudamqp.com;virtualHost=lupcpmxk;username=lupcpmxk;password=V50BilRpuuPrQ33ZeRKj0Flq5XAGG0sb";
 
-        private string cloudAMQPConnectionString;
-        private string sqlConnectionSrting;
-
-        public Startup(IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            _env = env;
-
-            if (_env.IsDevelopment())
-            {
-                //Write your CloudAMQP connection string here.
-                cloudAMQPConnectionString = ""; //REMOVE BEFORE COMMITING TO GITHUB!!
-            }
-            else if (_env.IsProduction())
-            {
-                cloudAMQPConnectionString = Environment.GetEnvironmentVariable("CloudAMQP");
-                sqlConnectionSrting = Environment.GetEnvironmentVariable("SQLServer");
-            }
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            _conf = builder.Build();
+            Configuration = configuration;
         }
+
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_env.IsDevelopment())
-            {
-                // In-memory database:
-                services.AddDbContext<CustomerApiContext>(opt => opt.UseInMemoryDatabase("CustomersDb"));
-            }
-            else if (_env.IsProduction())
-            {
-                //SQL database:
-                services.AddDbContext<CustomerApiContext>(opt => opt.UseSqlServer(sqlConnectionSrting));
-            }
+            // In-memory database:
+            services.AddDbContext<CustomerApiContext>(opt => opt.UseInMemoryDatabase("CustomersDb"));
 
             // Register repositories for dependency injection
             services.AddScoped<IRepository<Customer>, CustomerRepository>();
@@ -76,14 +53,12 @@ namespace CustomerApi
                 var services = scope.ServiceProvider;
                 var dbContext = services.GetService<CustomerApiContext>();
                 var dbInitializer = services.GetService<IDbInitializer>();
-                //dbInitializer.Initialize(dbContext);
-                dbContext.Database.EnsureCreated();
+                dbInitializer.Initialize(dbContext);
             }
             Task.Factory.StartNew(() =>
                 new MessageListener(app.ApplicationServices, cloudAMQPConnectionString).Start());
 
-            if (env.IsDevelopment())
-            {
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
 
@@ -93,8 +68,7 @@ namespace CustomerApi
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
         }
