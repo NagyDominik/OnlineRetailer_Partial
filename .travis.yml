@@ -9,8 +9,7 @@ addons:
 
 before_install:
   - sudo apt-get install nuget
-install:
-  - dotnet restore
+
 branches:
     only:
      - Testing
