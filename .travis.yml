@@ -9,6 +9,8 @@ addons:
 
 before_install:
   - sudo apt-get install nuget
+install:
+   - dotnet restore OnlineRetailer.sln
 
 branches:
     only:
