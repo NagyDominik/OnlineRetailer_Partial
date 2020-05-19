@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: productapi
-        image: nagydominik98/or_productapi:release
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:
