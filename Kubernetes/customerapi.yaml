@@ -15,7 +15,6 @@ spec:
     spec:
       containers:
       - name: customerapi
-        image: nagydominik98/or_customerapi:release
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:

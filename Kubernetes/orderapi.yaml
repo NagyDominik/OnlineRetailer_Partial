@@ -15,7 +15,6 @@ spec:
     spec:
       containers:
       - name: orderapi
-        image: nagydominik98/or_orderapi:release
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:
