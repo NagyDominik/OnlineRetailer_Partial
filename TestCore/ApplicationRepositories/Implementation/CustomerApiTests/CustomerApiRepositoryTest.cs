@@ -15,8 +15,7 @@ namespace TestCore.ApplicationRepositories.Implementation.CustomerApiTests
 {
     public class CustomerApiRepositoryTest
     {
-        private MockHelper helper = new MockHelper();
-        private List<Customer> customers;
+        private readonly MockHelper helper = new MockHelper();
 
         #region MockData
 
