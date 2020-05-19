@@ -29,3 +29,15 @@ spec:
   ports:
   - port: 80
     nodePort: 31001
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  ASPNETCORE_ENVIRONMENT: ""
+  CloudAMQP: ""
+  SQLServer: ""
+metadata:
+  labels:
+    app: productapi
+  name: productapi-config
+  namespace: default
