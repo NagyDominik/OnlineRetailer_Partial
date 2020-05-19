@@ -230,7 +230,7 @@ namespace TestCore.ApplicationRepositories.Implementation.CustomerApiTests
                     new EntityType("Customer", model.Object,
                         Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
 
-            dbSetMock.Setup(x => x.Update(It.IsAny<Customer>()));
+            contextMock.Setup(x => x.Attach(It.IsAny<Customer>())).Returns(custEntry.Object);
 
             IRepository<Customer> customerRepository = new CustomerRepository(contextMock.Object);
 
@@ -241,6 +241,7 @@ namespace TestCore.ApplicationRepositories.Implementation.CustomerApiTests
 
             //Throws a NullReferenceException when it reach the edit method in the repo.
             customerRepository.Edit(customers[0]);
+            
             Assert.Equal(customer.Email, customer.Email);
         }
     }
