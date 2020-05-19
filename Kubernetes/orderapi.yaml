@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: orderapi
-        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial/orderapi
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:

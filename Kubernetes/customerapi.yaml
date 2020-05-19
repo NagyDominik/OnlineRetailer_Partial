@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: customerapi
-        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial/customerapi
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:
