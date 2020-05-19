@@ -15,5 +15,5 @@ branches:
      - Testing
 
 script:
- - dotnet build
+ - dotnet build OnlineRetailer.sln
  - dotnet test TestCore/TestCore.csproj"
