@@ -1,10 +1,7 @@
 os: windows
 language: csharp
 mono: none
-sudo: required
 
-before_install:
-  - sudo apt-get install nuget
 branches:
     only:
      - Testing
