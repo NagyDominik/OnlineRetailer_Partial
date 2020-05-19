@@ -175,5 +175,44 @@ namespace TestCore.ApplicationRepositories.Implementation.ProductApiTests
         }
 
         #endregion
+
+        //#region UpdateProduct
+
+        //[Theory]
+        //[ClassData(typeof(ProductTestData))]
+        //public void UpdateCustomerTest(Product product)
+        //{
+        //    List<Product> products = LoadProducts();
+
+        //    Mock<DbSet<Product>> dbSetMock = new Mock<DbSet<Product>>();
+        //    Mock<ProductApiContext> contextMock = new Mock<ProductApiContext>();
+
+        //    contextMock.Setup(x => x.Products).Returns(dbSetMock.Object);
+
+        //    // Create a mock EntityEntry<Customer>
+        //    Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+        //    Mock<Model> model = new Mock<Model>();
+
+        //    Mock<EntityEntry<Product>> prodEntry = new Mock<EntityEntry<Product>>(
+        //        new InternalShadowEntityEntry(iStateManager.Object,
+        //            new EntityType("Product", model.Object,
+        //                Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+
+        //    contextMock.Setup(x => x.Attach(It.IsAny<Product>())).Returns(prodEntry.Object);
+
+        //    IRepository<Product> customerRepository = new ProductRepository(contextMock.Object);
+
+
+        //    // updating an existing customer
+        //    // CreditStanding is the only property that can be Updated.
+        //    products[0].ItemsReserved = 5;
+
+        //    //Throws a NullReferenceException when it reach the edit method in the repo.
+        //    customerRepository.Edit(products[0]);
+
+        //    Assert.Equal(product.ItemsReserved, product.ItemsReserved);
+        //}
+
+        //#endregion
     }
 }

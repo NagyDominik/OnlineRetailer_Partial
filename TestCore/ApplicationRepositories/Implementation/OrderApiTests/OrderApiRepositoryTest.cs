@@ -285,68 +285,68 @@ namespace TestCore.ApplicationRepositories.Implementation.OrderApiTests
 
         #endregion
 
-        [Fact]
-        public void AddCustomer()
-        {
-            List<Order> orders = LoadOrders();
-            List<OrderLine> orderLines = LoadOrderLines();
+        //[Fact]
+        //public void AddOrder()
+        //{
+        //    List<Order> orders = LoadOrders();
+        //    List<OrderLine> orderLines = LoadOrderLines();
 
-            Order testOrder = new Order()
-            {
-                Id = 4,
-                CustomerId = 2,
-                Date = DateTime.Now.AddDays(-1),
-                Status = Status.Completed,
-                OrderLines = new List<OrderLine>()
-            };
+        //    Order testOrder = new Order()
+        //    {
+        //        Id = 4,
+        //        CustomerId = 2,
+        //        Date = DateTime.Now.AddDays(-1),
+        //        Status = Status.Completed,
+        //        OrderLines = new List<OrderLine>()
+        //    };
 
-            //OrderLine testOrderLine = new OrderLine()
-            //{
-            //    Id = 3,
-            //    OrderId = 4,
-            //    ProductId = 17,
-            //    Quantity = 89,
-            //    Order = testOrder
-            //};
-            //testOrder.OrderLines.Add(testOrderLine);
-
-
-            foreach (var orderLine in orderLines)
-            {
-                orderLine.Order = orders.Find(order =>
-                {
-                    order.OrderLines.Add(orderLine);
-                    return order.Id == orderLine.OrderId;
-                });
-            }
-
-            Mock<DbSet<Order>> dbSetMockOrder = helper.GetQueryableMockDbSet(orders.ToArray());
-            Mock<DbSet<OrderLine>> dbSetMockOrderLine = helper.GetQueryableMockDbSet(orderLines.ToArray());
-
-            Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
-
-            contextMock.Setup(x => x.Orders).Returns(dbSetMockOrder.Object);
-            contextMock.Setup(x => x.OrderLines).Returns(dbSetMockOrderLine.Object);
-
-            // Create a mock EntityEntry<Customer>
-            Mock<IStateManager> iStateManager = new Mock<IStateManager>();
-            Mock<Model> model = new Mock<Model>();
-
-            Mock<EntityEntry<Order>> orderEntry = new Mock<EntityEntry<Order>>(
-                new InternalShadowEntityEntry(iStateManager.Object,
-                    new EntityType("Order", model.Object,
-                        Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
-
-            dbSetMockOrder.Setup(x => x.Add(It.IsAny<Order>())).Callback<Order>(o => orders.Add(o))
-                .Returns(orderEntry.Object);
+        //    //OrderLine testOrderLine = new OrderLine()
+        //    //{
+        //    //    Id = 3,
+        //    //    OrderId = 4,
+        //    //    ProductId = 17,
+        //    //    Quantity = 89,
+        //    //    Order = testOrder
+        //    //};
+        //    //testOrder.OrderLines.Add(testOrderLine);
 
 
-            IRepository<Order> orderRepository = new OrderRepository(contextMock.Object);
+        //    foreach (var orderLine in orderLines)
+        //    {
+        //        orderLine.Order = orders.Find(order =>
+        //        {
+        //            order.OrderLines.Add(orderLine);
+        //            return order.Id == orderLine.OrderId;
+        //        });
+        //    }
 
-            Order order = orderRepository.Add(testOrder);
+        //    Mock<DbSet<Order>> dbSetMockOrder = helper.GetQueryableMockDbSet(orders.ToArray());
+        //    Mock<DbSet<OrderLine>> dbSetMockOrderLine = helper.GetQueryableMockDbSet(orderLines.ToArray());
 
-            Assert.Equal(testOrder, orders[3]);
-            dbSetMockOrder.Verify(x => x.Add(testOrder), Times.Once);
-        }
+        //    Mock<OrderApiContext> contextMock = new Mock<OrderApiContext>();
+
+        //    contextMock.Setup(x => x.Orders).Returns(dbSetMockOrder.Object);
+        //    contextMock.Setup(x => x.OrderLines).Returns(dbSetMockOrderLine.Object);
+
+        //    // Create a mock EntityEntry<Customer>
+        //    Mock<IStateManager> iStateManager = new Mock<IStateManager>();
+        //    Mock<Model> model = new Mock<Model>();
+
+        //    Mock<EntityEntry<Order>> orderEntry = new Mock<EntityEntry<Order>>(
+        //        new InternalShadowEntityEntry(iStateManager.Object,
+        //            new EntityType("Order", model.Object,
+        //                Microsoft.EntityFrameworkCore.Metadata.ConfigurationSource.Convention)));
+
+        //    dbSetMockOrder.Setup(x => x.Add(It.IsAny<Order>())).Callback<Order>(o => orders.Add(o))
+        //        .Returns(orderEntry.Object);
+
+
+        //    IRepository<Order> orderRepository = new OrderRepository(contextMock.Object);
+
+        //    Order order = orderRepository.Add(testOrder);
+
+        //    Assert.Equal(testOrder, orders[3]);
+        //    dbSetMockOrder.Verify(x => x.Add(testOrder), Times.Once);
+        //}
     }
 }
