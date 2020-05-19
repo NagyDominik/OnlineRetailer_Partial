@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using DTOs;
+using Google.Api;
+using Google.Api.Gax.ResourceNames;
+using Google.Cloud.Monitoring.V3;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
@@ -91,6 +95,7 @@ namespace OrderApi.Controllers
 
 
                     newOrder = repository.Add(newOrder);
+                    AddSalesDataPoint(newOrder);
                     return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
                 catch
@@ -102,6 +107,85 @@ namespace OrderApi.Controllers
             {
                 return StatusCode(500, "Not enough products are available.");
             }
+        }
+
+        //Adds a data point using the Google Cloud monitoring API
+        // Implementation for demonstration
+        private void AddSalesDataPoint(Order newOrder)
+        {
+#if DEBUG
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\Users\Peter\Downloads\Comp-Assignment-OnlineRetail-ab5561e2a955.json");
+#endif
+
+            string projectId = "resolute-land-274909";
+
+            MetricServiceClient client = MetricServiceClient.Create();
+
+            ProjectName name = new ProjectName(projectId);
+
+            double sales = 0;
+
+
+            foreach (var item in newOrder.OrderLines)
+            {
+                // This would be implemented by the product itself
+                switch (item.ProductId)
+                {
+                    case 1:
+                        sales += item.Quantity * 10;
+                        break;
+                    case 2:
+                        sales += item.Quantity * 15;
+                        break;
+                    case 3:
+                        sales += item.Quantity * 20;
+                        break;
+                    default:
+                        sales = 10;
+                        break;
+                }
+            }
+
+            TypedValue salesTotal = new TypedValue
+            {
+                DoubleValue = sales
+            };
+            Point dataPoint = new Point
+            {
+                Value = salesTotal
+            };
+
+            Timestamp timestamp = new Timestamp
+            {
+                Seconds = (long)(DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds
+            };
+
+            TimeInterval interval = new TimeInterval
+            {
+                EndTime = timestamp
+            };
+            dataPoint.Interval = interval;
+
+            Metric metric = new Metric
+            {
+                Type = "custom.googleapis.com/shops/daily_sales"
+            };
+            metric.Labels.Add("cust_id", newOrder.CustomerId.ToString());
+            MonitoredResource resource = new MonitoredResource
+            {
+                Type = "global"
+            };
+
+            TimeSeries timeSeriesData = new TimeSeries
+            {
+                Metric = metric,
+                Resource = resource
+            };
+            timeSeriesData.Points.Add(dataPoint);
+
+            IEnumerable<TimeSeries> timeSeries = new List<TimeSeries> { timeSeriesData };
+
+            client.CreateTimeSeries(name, timeSeries);
         }
 
         private bool ProductItemsAvailable(OrderDTO order)
