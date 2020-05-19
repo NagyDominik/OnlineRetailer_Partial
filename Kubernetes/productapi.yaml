@@ -15,6 +15,7 @@ spec:
     spec:
       containers:
       - name: productapi
+        image: nagydominik98/or_productapi:release
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:
