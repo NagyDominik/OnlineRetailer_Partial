@@ -19,3 +19,8 @@ branches:
 script:
  - dotnet build OnlineRetailer.sln
  - dotnet test TestCore/TestCore.csproj
+
+ deploy:
+  provider: gae
+   keyfile: "client-secret.json.enc"
+   project: "OnlineRetailer_Partial"
