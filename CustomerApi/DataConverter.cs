@@ -11,7 +11,7 @@ namespace CustomerApi
             ret.Id = dto.Id;
             ret.Name = dto.Name;
             ret.Email = dto.Email;
-            ret.Email = dto.PhoneNumber;
+            ret.PhoneNumber = dto.PhoneNumber;
             ret.BillingAddress = dto.BillingAddress;
             ret.ShippingAddress = dto.ShippingAddress;
             ret.CreditStanding = dto.CreditStanding;

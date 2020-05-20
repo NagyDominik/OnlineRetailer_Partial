@@ -15,7 +15,23 @@ spec:
     spec:
       containers:
       - name: customerapi
-        image: nagydominik98/or_customerapi:release
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial/customerapi
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: customerapi-config
+              key: ASPNETCORE_ENVIRONMENT      
+        - name: CloudAMQP
+          valueFrom:
+            configMapKeyRef:
+              name: customerapi-config
+              key: CloudAMQP
+        - name: SQLServer
+          valueFrom:
+            configMapKeyRef:
+              name: customerapi-config
+              key: SQLServer
 ---
 apiVersion: v1
 kind: Service

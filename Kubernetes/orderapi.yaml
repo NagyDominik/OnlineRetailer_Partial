@@ -15,7 +15,23 @@ spec:
     spec:
       containers:
       - name: orderapi
-        image: nagydominik98/or_orderapi:release
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial/orderapi
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: orderapi-config
+              key: ASPNETCORE_ENVIRONMENT      
+        - name: CloudAMQP
+          valueFrom:
+            configMapKeyRef:
+              name: orderapi-config
+              key: CloudAMQP
+        - name: SQLServer
+          valueFrom:
+            configMapKeyRef:
+              name: orderapi-config
+              key: SQLServer
 ---
 apiVersion: v1
 kind: Service

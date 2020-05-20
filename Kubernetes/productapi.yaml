@@ -15,7 +15,23 @@ spec:
     spec:
       containers:
       - name: productapi
-        image: nagydominik98/or_productapi:release
+        image: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial/productapi
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: productapi-config
+              key: ASPNETCORE_ENVIRONMENT      
+        - name: CloudAMQP
+          valueFrom:
+            configMapKeyRef:
+              name: productapi-config
+              key: CloudAMQP
+        - name: SQLServer
+          valueFrom:
+            configMapKeyRef:
+              name: productapi-config
+              key: SQLServer
 ---
 apiVersion: v1
 kind: Service
