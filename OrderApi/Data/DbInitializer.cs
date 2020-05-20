@@ -13,7 +13,7 @@ namespace OrderApi.Data
             // Look for any Products
             if (context.Orders.Any())
             {
-                return;   // DB has been seeded
+                return; // DB has been seeded
             }
 
             context.SaveChanges();

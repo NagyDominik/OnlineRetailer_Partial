@@ -17,14 +17,14 @@ namespace CustomerApi.Data
 
         Customer IRepository<Customer>.Add(Customer entity)
         {
-            var newCustomer = db.Customers.Add(entity).Entity;
+            Customer newCustomer = db.Customers.Add(entity).Entity;
             db.SaveChanges();
             return newCustomer;
         }
 
         void IRepository<Customer>.Edit(Customer entity)
         {
-            db.Entry(entity).State = EntityState.Modified;
+            db.Attach(entity).State = EntityState.Modified;
             db.SaveChanges();
         }
 
@@ -40,7 +40,7 @@ namespace CustomerApi.Data
 
         void IRepository<Customer>.Remove(int id)
         {
-            var customer = db.Customers.FirstOrDefault(c => c.Id == id);
+            Customer customer = db.Customers.FirstOrDefault(c => c.Id == id);
             db.Customers.Remove(customer);
             db.SaveChanges();
         }
