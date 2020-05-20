@@ -14,7 +14,7 @@ install:
 
 branches:
     only:
-     - Testing
+     - Messaging
 
 script:
  - dotnet build OnlineRetailer.sln
