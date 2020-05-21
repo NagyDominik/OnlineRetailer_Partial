@@ -12,10 +12,6 @@ before_install:
 install:
    - dotnet restore OnlineRetailer.sln
 
-branches:
-    only:
-     - Testing
-
 script:
  - dotnet build OnlineRetailer.sln
  - dotnet test TestCore/TestCore.csproj
@@ -24,3 +20,5 @@ script:
   provider: gae
   project: resolute-land-274909
   keyfile: gce.json
+  verbosity: debug
+  on: Testing
