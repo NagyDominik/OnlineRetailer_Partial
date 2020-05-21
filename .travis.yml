@@ -8,7 +8,7 @@ addons:
     - dotnet-sdk-3.0
 
 before_install:
-  - sudo apt-get install nuget
+  - openssl aes-256-cbc -K $encrypted_a3c2492b5906_key -iv $encrypted_a3c2492b5906_iv -in gce.json.enc -out gce.json -d
 install:
    - dotnet restore OnlineRetailer.sln
 
@@ -19,3 +19,8 @@ branches:
 script:
  - dotnet build OnlineRetailer.sln
  - dotnet test TestCore/TestCore.csproj
+
+ deploy:
+  provider: gae
+  project: resolute-land-274909
+  keyfile: gce.json
