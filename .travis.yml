@@ -20,3 +20,5 @@ script:
   provider: gae
   project: resolute-land-274909
   keyfile: gce.json
+  on:
+    all_branches: true
