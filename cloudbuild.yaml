@@ -1,10 +1,4 @@
 steps:
-  - name: gcr.io/cloud-builders/dotnet
-    entrypoint: 'bash'
-    args:
-        - '-c'
-        - |
-            dotnet test --no-build -c ${_BUILD_CONFIG} $REPO_NAME\\TestCore
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -60,17 +54,17 @@ images:
 options:
   substitutionOption: ALLOW_LOOSE
 substitutions:
-  _IMAGE_NAME: gcr.io/resolute-land-274909/github_nagydominik_onlineretailer_partial
-  _GKE_LOCATION: europe-west3-a
-  _K8S_NAMESPACE: default
-  _OUTPUT_BUCKET_PATH: resolute-land-274909_cloudbuild/deploy
-  _K8S_APP_NAME: productapi
   _K8S_LABELS: ''
+  _GKE_LOCATION: europe-west3-a
   _DOCKERFILE_DIR: ''
-  _DOCKERFILE_NAME: Dockerfile_productapi
-  _K8S_YAML_PATH: Kubernetes/productapi.yaml
+  _DOCKERFILE_NAME: Dockerfile_customerapi
+  _K8S_NAMESPACE: default
   _GKE_CLUSTER: onlineretailer-cluster
-  _K8S_ANNOTATIONS: gcb-trigger-id=cb8757e5-7dce-4aa9-bd43-6c4418f9dacb
+  _K8S_ANNOTATIONS: gcb-trigger-id=452f8436-589f-49bd-8b86-ee26460c79df
+  _K8S_YAML_PATH: Kubernetes/customerapi.yaml
+  _K8S_APP_NAME: customerapi
+  _OUTPUT_BUCKET_PATH: resolute-land-274909_cloudbuild/deploy
+  _IMAGE_NAME: gcr.io/resolute-land-274909/github.com/nagydominik/onlineretailer_partial
 tags:
   - gcp-cloud-build-deploy
   - $_K8S_APP_NAME
